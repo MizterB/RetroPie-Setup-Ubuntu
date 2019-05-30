@@ -2,7 +2,7 @@
 Script to automate the installation on RetroPie on Ubuntu Server, with the end-state user experience nearly identical to a Raspberry Pi installation, but with the power and flexibility of x86.
 
 This script was inspired by feedback provided on the [RetroPie forums](https://retropie.org.uk/forum/topic/18810/retropie-installation-on-ubuntu-server-x64-18-04-1), and does the following:
-- Disables sudo password promts
+- Disables sudo password prompts
 - Installs the minimal OS dependecies needed to install OpenBox and run RetroPie
 - Installs the RetroPie 'core' modules (it does not install any emaulators - you can run Retropie Setup later to configure as needed)
 - Hides all GRUB and kernel text output during startup/shutdown
