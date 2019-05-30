@@ -14,7 +14,7 @@ This script was inspired by feedback provided on the [RetroPie forums](https://r
 Of course, your mileage may vary when using this script.  I have organized it into functions to improve readability.  If you don't want to run the full script, you can copy/paste the sections that apply to the specific changes you wish to make.  Just note that many of these command would need to be run in `sudo` if executed independently and *variable substitution may be required*.
 
 ## Usage (Tested Steps)
-- Perform a basic install of Ubuntu Server (this was tested on 18.04.2 LTS) using default opions
+- Perform a basic install of Ubuntu Server (this was tested on 18.04.2 LTS) using default opitons
   - Language: `english`
   - Keyboard: `english`
   - Username: `pi` 
