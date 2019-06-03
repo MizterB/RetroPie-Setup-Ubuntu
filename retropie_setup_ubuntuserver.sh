@@ -169,8 +169,51 @@ function autostart_openbox_apps() {
     echo "--------------------------------------------"
     mkdir -p $USER_HOME/.config/openbox
     echo 'unclutter -idle 0.01 -root' >> $USER_HOME/.config/openbox/autostart
-    echo 'gnome-terminal --full-screen --hide-menubar -- emulationstation --no-splash' >> $USER_HOME/.config/openbox/autostart
+    echo 'gnome-terminal --full-screen --hide-menubar -- emulationstation --no-slash' >> $USER_HOME/.config/openbox/autostart
     chown -R $USER:$USER $USER_HOME/.config/openbox
+}
+
+function add_retroarch_shaders() {
+    echo "--------------------------------------------"
+    echo "- Merging common shaders & GLSL shaders"
+    echo "- into to RetroArch"
+    echo "--------------------------------------------"
+    # Common shaders
+    git clone --depth=1 https://github.com/libretro/common-shaders.git /tmp/common-shaders
+    cp -r /tmp/common-shaders/* /opt/retropie/configs/all/retroarch/shaders/
+    rm -rf /tmp/common-shaders
+    # GLSL shaders
+    git clone --depth=1 https://github.com/libretro/glsl-shaders.git /tmp/glsl-shaders
+    cp -r /tmp/glsl-shaders/* /opt/retropie/configs/all/retroarch/shaders/
+    rm -rf /tmp/glsl-shaders
+}
+
+function install_ultimarc_linux() {
+    echo "--------------------------------------------"
+    echo "- Installing Ultimarc tools for Linux"
+    echo "--------------------------------------------"
+
+    # Dependencies
+    apt-get -y install autoconf libudev-dev libjson-c-dev libusb-1.0-0-dev libtool
+    git clone --depth=1 https://github.com/katie-snow/Ultimarc-linux.git /tmp/ultimarc-linux
+    cd /tmp/ultimarc-linux
+    ./autogen.sh
+    ./configure
+    make
+    mkdir -p /opt/retropie/supplementary/ultimarc-linux/examples
+    cp /tmp/ultimarc-linux/21-ultimarc.rules /etc/udev/rules.d/
+    cp -r /tmp/ultimarc-linux/src/umtool/.deps /opt/retropie/supplementary/ultimarc-linux/
+    cp -r /tmp/ultimarc-linux/src/umtool/.libs /opt/retropie/supplementary/ultimarc-linux/
+    cp /tmp/ultimarc-linux/src/umtool/umtool /opt/retropie/supplementary/ultimarc-linux/
+    cp /tmp/ultimarc-linux/src/umtool/*.json /opt/retropie/supplementary/ultimarc-linux/examples/
+}
+
+install_runcommand_launchingimages() {
+    echo "--------------------------------------------"
+    echo "- Installing launching images for runcommand"
+    echo "--------------------------------------------"
+
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh launchingimages
 }
 
 # Force this script to run as root
@@ -186,3 +229,8 @@ enable_autostart_xwindows
 enable_plymouth_theme
 hide_openbox_windows
 autostart_openbox_apps
+install_latest_video_drivers
+install_vulkan
+add_retroarch_shaders
+install_ultimarc_linux
+install_runcommand_launchingimages
