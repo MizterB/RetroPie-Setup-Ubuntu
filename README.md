@@ -24,7 +24,7 @@ Of course, your mileage may vary when using this script.  I have organized it in
 
 - Log in as the `pi` user and download a local copy of this script:
   
-  `curl -O https://raw.githubusercontent.com/MizterB/RetroPie-Setup-UbuntuServer/master/retropie_setup_ubuntuserver.sh`
+  `wget -O https://raw.githubusercontent.com/MizterB/RetroPie-Setup-UbuntuServer/master/retropie_setup_ubuntuserver.sh`
 
 - Make the file executable
   
@@ -33,6 +33,12 @@ Of course, your mileage may vary when using this script.  I have organized it in
 - Run as root
   
   `sudo ./retropie_setup_ubuntuserver.sh`
+
+
+## Single Step Install Method
+- Log in as the `pi` user and download a local copy of this script:
+  
+  `wget -O - https://raw.githubusercontent.com/MizterB/RetroPie-Setup-UbuntuServer/next/retropie_setup_ubuntuserver.sh | sudo bash`
 
 ## TODO
 - Improve configurability (run with options)
