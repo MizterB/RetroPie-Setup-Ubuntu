@@ -165,12 +165,17 @@ EOF
 
 function autostart_openbox_apps() {
     echo "--------------------------------------------"
-    echo "- Enabling OpenBox autostart applications"
+    echo "- Enabling OpenBox autostart applications and RetroPie autostart.sh"
     echo "--------------------------------------------"
+    # OpenBox autostarts unclutter, then passes off to the RetroPie autostart
     mkdir -p $USER_HOME/.config/openbox
     echo 'unclutter -idle 0.01 -root' >> $USER_HOME/.config/openbox/autostart
-    echo 'gnome-terminal --full-screen --hide-menubar -- emulationstation --no-slash' >> $USER_HOME/.config/openbox/autostart
+    echo '/opt/retropie/configs/all/autostart.sh' >> $USER_HOME/.config/openbox/autostart 
     chown -R $USER:$USER $USER_HOME/.config/openbox
+    # Create RetroPie autostart
+    touch /opt/retropie/configs/all/autostart.sh
+    chmod +x /opt/retropie/configs/all/autostart.sh
+    echo 'gnome-terminal --full-screen --hide-menubar -- emulationstation --no-splash' >> /opt/retropie/configs/all/autostart.sh
 }
 
 function add_retroarch_shaders() {
