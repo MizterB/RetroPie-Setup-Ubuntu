@@ -175,6 +175,7 @@ function autostart_openbox_apps() {
     # Create RetroPie autostart
     touch /opt/retropie/configs/all/autostart.sh
     chmod +x /opt/retropie/configs/all/autostart.sh
+    chown $USER:$USER /opt/retropie/configs/all/autostart.sh
     echo 'gnome-terminal --full-screen --hide-menubar -- emulationstation --no-splash' >> /opt/retropie/configs/all/autostart.sh
 }
 
