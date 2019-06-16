@@ -45,9 +45,9 @@ function install_vulkan() {
     apt-get -y install --no-install-recommends mesa-vulkan-drivers
 }
 
-function install_retropie_core() {
+function install_retropie() {
     echo "--------------------------------------------"
-    echo "- Installing RetroPie core modules"
+    echo "- Installing RetroPie"
     echo "--------------------------------------------"
 # Get Retropie Setup script and perform a basic install with Samba
     cd $USER_HOME
@@ -57,8 +57,8 @@ function install_retropie_core() {
     #$USER_HOME/RetroPie-Setup/retropie_packages.sh emulationstation 
     #$USER_HOME/RetroPie-Setup/retropie_packages.sh retropiemenu
     #$USER_HOME/RetroPie-Setup/retropie_packages.sh runcommand
-    #$USER_HOME/RetroPie-Setup/retropie_packages.sh samba
-    #$USER_HOME/RetroPie-Setup/retropie_packages.sh samba install_shares
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh samba
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh samba install_shares
     chown -R $USER:$USER $USER_HOME/RetroPie-Setup
 }
 
@@ -228,15 +228,15 @@ install_runcommand_launchingimages() {
 # Execute these steps
 disable_sudo_password
 install_retropie_dependencies
-install_retropie_core
+install_retropie
 hide_boot_messages
 enable_autologin_tty
 enable_autostart_xwindows
 enable_plymouth_theme
 hide_openbox_windows
 autostart_openbox_apps
-install_latest_video_drivers
-install_vulkan
+#install_latest_video_drivers
+#install_vulkan
 add_retroarch_shaders
-install_ultimarc_linux
-install_runcommand_launchingimages
+#install_ultimarc_linux
+#install_runcommand_launchingimages
