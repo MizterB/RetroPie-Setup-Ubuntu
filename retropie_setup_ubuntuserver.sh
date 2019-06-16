@@ -132,7 +132,7 @@ function hide_openbox_windows() {
     echo "--------------------------------------------"
     # Reduce the visibility of the gnome terminal by prepending these settings in the bash profile
     GNOME_TERMINAL_SETTINGS='dbus-launch gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/'
-    cat << EOF > $USER_HOME/.bash_profile
+    cat << EOF >> $USER_HOME/.bash_profile
 $GNOME_TERMINAL_SETTINGS use-theme-colors false
 $GNOME_TERMINAL_SETTINGS use-theme-transparency false
 $GNOME_TERMINAL_SETTINGS default-show-menubar false
