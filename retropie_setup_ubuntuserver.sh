@@ -52,13 +52,13 @@ function install_retropie_core() {
 # Get Retropie Setup script and perform a basic install with Samba
     cd $USER_HOME
     git clone --depth=1 https://github.com/RetroPie/RetroPie-Setup.git
-    #$USER_HOME/RetroPie-Setup/retropie_packages.sh setup basic_install
-    $USER_HOME/RetroPie-Setup/retropie_packages.sh retroarch
-    $USER_HOME/RetroPie-Setup/retropie_packages.sh emulationstation 
-    $USER_HOME/RetroPie-Setup/retropie_packages.sh retropiemenu
-    $USER_HOME/RetroPie-Setup/retropie_packages.sh runcommand
-    $USER_HOME/RetroPie-Setup/retropie_packages.sh samba
-    $USER_HOME/RetroPie-Setup/retropie_packages.sh samba install_shares
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh setup basic_install
+    #$USER_HOME/RetroPie-Setup/retropie_packages.sh retroarch
+    #$USER_HOME/RetroPie-Setup/retropie_packages.sh emulationstation 
+    #$USER_HOME/RetroPie-Setup/retropie_packages.sh retropiemenu
+    #$USER_HOME/RetroPie-Setup/retropie_packages.sh runcommand
+    #$USER_HOME/RetroPie-Setup/retropie_packages.sh samba
+    #$USER_HOME/RetroPie-Setup/retropie_packages.sh samba install_shares
     chown -R $USER:$USER $USER_HOME/RetroPie-Setup
 }
 
