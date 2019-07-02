@@ -49,14 +49,11 @@ function install_retropie() {
     echo "--------------------------------------------"
     echo "- Installing RetroPie"
     echo "--------------------------------------------"
-# Get Retropie Setup script and perform a basic install with Samba
+    # Get Retropie Setup script and perform a basic install with Samba
+    # NOTE: Installing the 'core' packages individually creates issues, use basic_install instead
     cd $USER_HOME
     git clone --depth=1 https://github.com/RetroPie/RetroPie-Setup.git
     $USER_HOME/RetroPie-Setup/retropie_packages.sh setup basic_install
-    #$USER_HOME/RetroPie-Setup/retropie_packages.sh retroarch
-    #$USER_HOME/RetroPie-Setup/retropie_packages.sh emulationstation 
-    #$USER_HOME/RetroPie-Setup/retropie_packages.sh retropiemenu
-    #$USER_HOME/RetroPie-Setup/retropie_packages.sh runcommand
     $USER_HOME/RetroPie-Setup/retropie_packages.sh samba
     $USER_HOME/RetroPie-Setup/retropie_packages.sh samba install_shares
     chown -R $USER:$USER $USER_HOME/RetroPie-Setup
@@ -101,8 +98,13 @@ function hide_boot_messages() {
     echo "- Hiding boot messages"
     echo "--------------------------------------------"
     # Hide kernel messages and blinking cursor via GRUB
+    sed -i -e 's/GRUB_CMDLINE_LINUX_DEFAULT="quiet"/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash vt.global_cursor_default=0"/g' /etc/default/grub
     sed -i -e 's/GRUB_CMDLINE_LINUX_DEFAULT=""/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash vt.global_cursor_default=0"/g' /etc/default/grub
-    sudo update-grub
+    update-grub
+
+    # Hide fsck messages after Plymouth splash
+    echo 'FRAMEBUFFER=y' > /etc/initramfs-tools/conf.d/splash
+    update-initramfs -u
 
     # Remove cloud-init to supress its boot messages
     apt-get purge cloud-init -y
@@ -173,6 +175,7 @@ function autostart_openbox_apps() {
     echo '/opt/retropie/configs/all/autostart.sh' >> $USER_HOME/.config/openbox/autostart 
     chown -R $USER:$USER $USER_HOME/.config/openbox
     # Create RetroPie autostart
+    mkdir -p /opt/retropie/configs/all
     touch /opt/retropie/configs/all/autostart.sh
     chmod +x /opt/retropie/configs/all/autostart.sh
     chown $USER:$USER /opt/retropie/configs/all/autostart.sh

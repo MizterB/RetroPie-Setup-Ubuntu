@@ -1,5 +1,5 @@
-# RetroPie-Setup-UbuntuServer
-Script to automate the installation on RetroPie on Ubuntu Server, with the end-state user experience nearly identical to a Raspberry Pi installation, but with the power and flexibility of x86.
+# RetroPie-Setup-Ubuntu
+Script to automate the installation on RetroPie on Ubuntu, with the end-state user experience nearly identical to a Raspberry Pi installation, but with the power and flexibility of x86.
 
 This script was inspired by feedback provided on the [RetroPie forums](https://retropie.org.uk/forum/topic/18810/retropie-installation-on-ubuntu-server-x64-18-04-1), and does the following:
 - Disables sudo password prompts
@@ -24,21 +24,21 @@ Of course, your mileage may vary when using this script.  I have organized it in
 
 - Log in as the `pi` user and download a local copy of this script:
   
-  `wget -O https://raw.githubusercontent.com/MizterB/RetroPie-Setup-UbuntuServer/master/retropie_setup_ubuntuserver.sh`
+  `wget "https://raw.githubusercontent.com/MizterB/RetroPie-Setup-Ubuntu/master/retropie_setup_ubuntu.sh"`
 
 - Make the file executable
   
-  `chmod +x ./retropie_setup_ubuntuserver.sh`
+  `chmod +x ./retropie_setup_ubuntu.sh`
 
 - Run as root
   
-  `sudo ./retropie_setup_ubuntuserver.sh`
+  `sudo ./retropie_setup_ubuntu.sh`
 
 
 ## Single Step Install Method
 - Log in as the `pi` user and download a local copy of this script:
   
-  `wget -O - https://raw.githubusercontent.com/MizterB/RetroPie-Setup-UbuntuServer/next/retropie_setup_ubuntuserver.sh | sudo bash`
+  `wget -O - https://raw.githubusercontent.com/MizterB/RetroPie-Setup-UbuntuServer/next/retropie_setup_ubuntu.sh | sudo bash`
 
 ## TODO
 - Improve configurability (run with options)
