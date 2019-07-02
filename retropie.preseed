@@ -6,7 +6,7 @@
 # http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/current/images/netboot/mini.iso
 
 ### Boot options for netboot
-# auto=true preseed/url=http://{{host}}/preseed.cfg priority=critical quiet ---
+# auto=true preseed/url=http://{{host}}/retropie.preseed priority=critical quiet ---
 
 ### Unattended Installation
 d-i auto-install/enable boolean true
@@ -155,7 +155,7 @@ d-i preseed/late_command string \
  in-target sh -c 'echo retropie > /etc/hostname'; \
  in-target sh -c 'mkdir -p --mode=750 /home/pi'; \
  in-target sh -c 'chown pi:pi /home/pi'; \
- in-target sh -c 'wget -O /home/pi/retropie_setup_ubuntu.sh "https://raw.githubusercontent.com/MizterB/RetroPie-Setup-UbuntuServer/master/retropie_setup_ubuntuserver.sh"'; \
+ in-target sh -c 'wget -O /home/pi/retropie_setup_ubuntu.sh "https://raw.githubusercontent.com/MizterB/RetroPie-Setup-UbuntuServer/next/retropie_setup_ubuntu.sh"'; \
  in-target sh -c 'chmod +x /home/pi/retropie_setup_ubuntu.sh'; \
  in-target sh -c 'eject || true';
 d-i debian-installer/splash boolean false
