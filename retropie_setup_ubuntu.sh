@@ -180,6 +180,8 @@ function autostart_openbox_apps() {
     chmod +x /opt/retropie/configs/all/autostart.sh
     chown $USER:$USER /opt/retropie/configs/all/autostart.sh
     cat << EOF > /opt/retropie/configs/all/autostart.sh
+#! /bin/bash
+
 ###############################################################################
 # Start EmulationStation
 ###############################################################################
