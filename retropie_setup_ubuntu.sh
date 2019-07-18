@@ -202,6 +202,8 @@ function add_retroarch_shaders() {
     git clone --depth=1 https://github.com/libretro/glsl-shaders.git /tmp/glsl-shaders
     cp -r /tmp/glsl-shaders/* /opt/retropie/configs/all/retroarch/shaders/
     rm -rf /tmp/glsl-shaders
+    # Remove git repository from shader dir
+    rm -rf /opt/retropie/configs/all/retroarch/shaders/.git
 }
 
 # Force this script to run as root
