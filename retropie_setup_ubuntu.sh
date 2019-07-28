@@ -45,18 +45,15 @@ function install_vulkan() {
     apt-get -y install --no-install-recommends mesa-vulkan-drivers
 }
 
-function install_retropie_core() {
+function install_retropie() {
     echo "--------------------------------------------"
-    echo "- Installing RetroPie core modules"
+    echo "- Installing RetroPie"
     echo "--------------------------------------------"
-# Get Retropie Setup script and perform a basic install with Samba
+    # Get Retropie Setup script and perform a basic install with Samba
+    # NOTE: Installing the 'core' packages individually creates issues, use basic_install instead
     cd $USER_HOME
     git clone --depth=1 https://github.com/RetroPie/RetroPie-Setup.git
-    #$USER_HOME/RetroPie-Setup/retropie_packages.sh setup basic_install
-    $USER_HOME/RetroPie-Setup/retropie_packages.sh retroarch
-    $USER_HOME/RetroPie-Setup/retropie_packages.sh emulationstation 
-    $USER_HOME/RetroPie-Setup/retropie_packages.sh retropiemenu
-    $USER_HOME/RetroPie-Setup/retropie_packages.sh runcommand
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh setup basic_install
     $USER_HOME/RetroPie-Setup/retropie_packages.sh samba
     $USER_HOME/RetroPie-Setup/retropie_packages.sh samba install_shares
     chown -R $USER:$USER $USER_HOME/RetroPie-Setup
@@ -101,8 +98,13 @@ function hide_boot_messages() {
     echo "- Hiding boot messages"
     echo "--------------------------------------------"
     # Hide kernel messages and blinking cursor via GRUB
+    sed -i -e 's/GRUB_CMDLINE_LINUX_DEFAULT="quiet"/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash vt.global_cursor_default=0"/g' /etc/default/grub
     sed -i -e 's/GRUB_CMDLINE_LINUX_DEFAULT=""/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash vt.global_cursor_default=0"/g' /etc/default/grub
-    sudo update-grub
+    update-grub
+
+    # Hide fsck messages after Plymouth splash
+    echo 'FRAMEBUFFER=y' > /etc/initramfs-tools/conf.d/splash
+    update-initramfs -u
 
     # Remove cloud-init to supress its boot messages
     apt-get purge cloud-init -y
@@ -132,7 +134,7 @@ function hide_openbox_windows() {
     echo "--------------------------------------------"
     # Reduce the visibility of the gnome terminal by prepending these settings in the bash profile
     GNOME_TERMINAL_SETTINGS='dbus-launch gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/'
-    cat << EOF > $USER_HOME/.bash_profile
+    cat << EOF >> $USER_HOME/.bash_profile
 $GNOME_TERMINAL_SETTINGS use-theme-colors false
 $GNOME_TERMINAL_SETTINGS use-theme-transparency false
 $GNOME_TERMINAL_SETTINGS default-show-menubar false
@@ -165,12 +167,26 @@ EOF
 
 function autostart_openbox_apps() {
     echo "--------------------------------------------"
-    echo "- Enabling OpenBox autostart applications"
+    echo "- Enabling OpenBox autostart applications and RetroPie autostart.sh"
     echo "--------------------------------------------"
+    # OpenBox autostarts unclutter, then passes off to the RetroPie autostart
     mkdir -p $USER_HOME/.config/openbox
     echo 'unclutter -idle 0.01 -root' >> $USER_HOME/.config/openbox/autostart
-    echo 'gnome-terminal --full-screen --hide-menubar -- emulationstation --no-slash' >> $USER_HOME/.config/openbox/autostart
+    echo '/opt/retropie/configs/all/autostart.sh' >> $USER_HOME/.config/openbox/autostart 
     chown -R $USER:$USER $USER_HOME/.config/openbox
+    # Create RetroPie autostart
+    mkdir -p /opt/retropie/configs/all
+    touch /opt/retropie/configs/all/autostart.sh
+    chmod +x /opt/retropie/configs/all/autostart.sh
+    chown $USER:$USER /opt/retropie/configs/all/autostart.sh
+    cat << EOF > /opt/retropie/configs/all/autostart.sh
+#! /bin/bash
+
+###############################################################################
+# Start EmulationStation
+###############################################################################
+gnome-terminal --full-screen --hide-menubar -- emulationstation --no-splash
+EOF
 }
 
 function add_retroarch_shaders() {
@@ -186,34 +202,8 @@ function add_retroarch_shaders() {
     git clone --depth=1 https://github.com/libretro/glsl-shaders.git /tmp/glsl-shaders
     cp -r /tmp/glsl-shaders/* /opt/retropie/configs/all/retroarch/shaders/
     rm -rf /tmp/glsl-shaders
-}
-
-function install_ultimarc_linux() {
-    echo "--------------------------------------------"
-    echo "- Installing Ultimarc tools for Linux"
-    echo "--------------------------------------------"
-
-    # Dependencies
-    apt-get -y install autoconf libudev-dev libjson-c-dev libusb-1.0-0-dev libtool
-    git clone --depth=1 https://github.com/katie-snow/Ultimarc-linux.git /tmp/ultimarc-linux
-    cd /tmp/ultimarc-linux
-    ./autogen.sh
-    ./configure
-    make
-    mkdir -p /opt/retropie/supplementary/ultimarc-linux/examples
-    cp /tmp/ultimarc-linux/21-ultimarc.rules /etc/udev/rules.d/
-    cp -r /tmp/ultimarc-linux/src/umtool/.deps /opt/retropie/supplementary/ultimarc-linux/
-    cp -r /tmp/ultimarc-linux/src/umtool/.libs /opt/retropie/supplementary/ultimarc-linux/
-    cp /tmp/ultimarc-linux/src/umtool/umtool /opt/retropie/supplementary/ultimarc-linux/
-    cp /tmp/ultimarc-linux/src/umtool/*.json /opt/retropie/supplementary/ultimarc-linux/examples/
-}
-
-install_runcommand_launchingimages() {
-    echo "--------------------------------------------"
-    echo "- Installing launching images for runcommand"
-    echo "--------------------------------------------"
-
-    $USER_HOME/RetroPie-Setup/retropie_packages.sh launchingimages
+    # Remove git repository from shader dir
+    rm -rf /opt/retropie/configs/all/retroarch/shaders/.git
 }
 
 # Force this script to run as root
@@ -222,15 +212,13 @@ install_runcommand_launchingimages() {
 # Execute these steps
 disable_sudo_password
 install_retropie_dependencies
-install_retropie_core
+install_retropie
 hide_boot_messages
 enable_autologin_tty
 enable_autostart_xwindows
 enable_plymouth_theme
 hide_openbox_windows
 autostart_openbox_apps
-install_latest_video_drivers
-install_vulkan
+#install_latest_video_drivers
+#install_vulkan
 add_retroarch_shaders
-install_ultimarc_linux
-install_runcommand_launchingimages
