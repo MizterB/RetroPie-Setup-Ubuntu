@@ -219,6 +219,6 @@ enable_autostart_xwindows
 enable_plymouth_theme
 hide_openbox_windows
 autostart_openbox_apps
-install_latest_video_drivers
-install_vulkan
+#install_latest_video_drivers
+#install_vulkan
 add_retroarch_shaders
