@@ -42,7 +42,7 @@ If you are familiar with the use of Preseed files to automate Ubuntu installs (n
 ## Single Step Install Method
 - Log in as the `pi` user and download a local copy of this script:
   
-  `wget -O - https://raw.githubusercontent.com/MizterB/RetroPie-Setup-UbuntuServer/next/retropie_setup_ubuntu.sh | sudo bash`
+  `wget -O - https://raw.githubusercontent.com/MizterB/RetroPie-Setup-UbuntuServer/master/retropie_setup_ubuntu.sh | sudo bash`
 
 ## TODO
 - Improve configurability (run with options)
