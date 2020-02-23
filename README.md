@@ -68,7 +68,6 @@ If you are familiar with the use of Preseed files to automate Ubuntu installs (n
 #### function enable_autostart_xwindows
  - change ~/ on several lines to $USER_HOME/ to match other functions
 #### function autostart_openbox_apps
- - changed chown command so it changes ownership to $USER from .config recursively instead of .config/openbox, resolves any weird permissions where root takes ownership.
  - changed chown command to /opt/retropie/configs recursively instead of just changing ownership on autostart.sh, otherwise some of the directories get owned by root again. opt/retropie/configs and all files/folders beneath should be owned by $USER
 #### function install_vulkan
  - remove -no-install-recommends just in case it causes issues
