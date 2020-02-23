@@ -52,7 +52,7 @@ If you are familiar with the use of Preseed files to automate Ubuntu installs (n
 ### 20200222
 #### Existing Functions:
 #### function install_retropie_dependencies
-- remove -no-install-recommends as having this causes a blank screen on boot for nvidia cards
+- remove -no-install-recommends as having this causes a blank screen on boot for nvidia cards when using a proprietary driver
 #### function add_retroarch_shaders
  - add line of code to remove the 'pi' centered shaders directory installed by RetroPie-Setup
  - recreate the shaders directory afresh
