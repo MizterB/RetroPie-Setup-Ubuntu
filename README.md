@@ -50,7 +50,7 @@ If you are familiar with the use of Preseed files to automate Ubuntu installs (n
 
 ## CHANGELOG
 ### 20200222
-#### Existing Functions:
+### Existing Functions:
 #### function install_retropie_dependencies
 - remove -no-install-recommends as having this causes a blank screen on boot for nvidia cards when using a proprietary driver
 #### function add_retroarch_shaders
@@ -71,7 +71,7 @@ If you are familiar with the use of Preseed files to automate Ubuntu installs (n
 - changed chown command to /opt/retropie/configs recursively instead of just changing ownership on autostart.sh, otherwise some of the directories get owned by root again. opt/retropie/configs and all files/folders beneath should be owned by $USER
 #### function install_vulkan
 - remove -no-install-recommends just in case it causes issues
-#### New Functions:
+### New Functions:
 added optional functions (not enabled by default) for:
 - installing the latest nvidia driver
 - disabling screen blanking
@@ -80,7 +80,7 @@ added optional functions (not enabled by default) for:
 - offer to reboot once last function is completed
 - fix permissions function which catches any potential snags where folders or files under $USER_HOME may get owned by root.
 - downloading retropie only (you need to comment out executing install_retropie in order to use this)
-#### Misc:
+### Misc:
 - added logging at top of file so console output is stored as retropie_setup_ubuntu.log when complete
 - reordered functions to match the order they execute in
 - reordered the execution of functions to resolve a couple of minor issues
