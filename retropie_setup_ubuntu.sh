@@ -349,9 +349,9 @@ enable_logging
 disable_sudo_password
 install_retropie_dependencies
 install_retropie
+add_retroarch_shaders
 install_latest_intel_drivers
 install_vulkan
-add_retroarch_shaders
 hide_boot_messages
 enable_autologin_tty
 enable_plymouth_theme
@@ -364,9 +364,13 @@ install_latest_nvidia_drivers
 disable_screen_blanking
 change_grub_gfxmode
 
+
 # retropie download only (do not install)
-# to use, comment out the install_retropie function above to prevent install and uncomment the below function
+# to use, comment out the install_retropie AND the add_retroarch_shaders function above to prevent install
+# then uncomment the below function
+#
 # useful if you want to install retropie components / emulators yourself rather than run a basic install
+#
 #download_retropie_only
 
 # Final cleanup
