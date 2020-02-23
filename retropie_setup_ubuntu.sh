@@ -234,7 +234,7 @@ function autostart_openbox_apps() {
     mkdir -p $USER_HOME/.config/openbox
     echo 'unclutter -idle 0.01 -root' >> $USER_HOME/.config/openbox/autostart
     echo '/opt/retropie/configs/all/autostart.sh' >> $USER_HOME/.config/openbox/autostart
-    chown -R $USER:$USER $USER_HOME/.config/openbox
+    chown -R $USER:$USER $USER_HOME/.config
     # Create RetroPie autostart
     mkdir -p /opt/retropie/configs/all
     touch /opt/retropie/configs/all/autostart.sh
@@ -292,6 +292,19 @@ function change_grub_gfxmode() {
     sleep 2
 }
 
+# Download RetroPie only - do not install
+function download_retropie_only() {
+    echo "--------------------------------------------"
+    echo "- Downloading RetroPie"
+    echo "--------------------------------------------"
+    # Get Retropie Setup script
+    cd $USER_HOME
+    git clone --depth=1 https://github.com/RetroPie/RetroPie-Setup.git
+    chown -R $USER:$USER $USER_HOME/RetroPie-Setup
+    echo "Done."
+    sleep 2
+}
+
 # Fix permissions function recursively on $USER_HOME directory
 function fix_home_permissions() {
     echo "--------------------------------------------"
@@ -328,19 +341,6 @@ function restart_system_prompt() {
     fi
 }
 
-# Download RetroPie only - do not install
-function download_retropie_only() {
-    echo "--------------------------------------------"
-    echo "- Downloading RetroPie"
-    echo "--------------------------------------------"
-    # Get Retropie Setup script
-    cd $USER_HOME
-    git clone --depth=1 https://github.com/RetroPie/RetroPie-Setup.git
-    chown -R $USER:$USER $USER_HOME/RetroPie-Setup
-    echo "Done."
-    sleep 2
-}
-
 # Force this script to run as root
 [ `whoami` = root ] || { sudo "$0" "$@"; exit $?; }
 
@@ -364,12 +364,12 @@ install_latest_nvidia_drivers
 disable_screen_blanking
 change_grub_gfxmode
 
+# retropie download only (do not install)
+# to use, comment out the install_retropie function above to prevent install and uncomment the below function
+# useful if you want to install retropie components / emulators yourself rather than run a basic install
+#download_retropie_only
+
 # Final cleanup
 fix_home_permissions
 cleanup_unneeded_packages
 restart_system_prompt
-
-# retropie download only, do not install it
-# comment out the install_retropie function above and uncomment the below function to use this
-# useful if you want to install retropie components yourself rather than run a basic install
-#download_retropie_only
