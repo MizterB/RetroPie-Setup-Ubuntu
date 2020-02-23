@@ -22,6 +22,8 @@ function enable_logging() {
     echo "--------------------------------------------"
     touch $LOG_FILE
     exec > >(tee $LOG_FILE) 2>&1
+    echo "Done."
+    sleep 2
 }
 
 # Add user to sudoers file and disable password prompt
@@ -30,6 +32,8 @@ function disable_sudo_password() {
     echo "- Disabling the sudo password prompt"
     echo "--------------------------------------------"
     echo "$USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+    echo "Done."
+    sleep 2
 }
 
 # Install RetroPie dependencies
@@ -39,6 +43,8 @@ function install_retropie_dependencies() {
     echo "--------------------------------------------"
     apt-get update && apt-get -y upgrade
     apt-get -y install ${RETROPIE_CORE_DEPENDS[@]} ${RETROPIE_EXTRA_DEPENDS[@]}
+    echo "Done."
+    sleep 2
 }
 
 #Install RetroPie
@@ -54,6 +60,8 @@ function install_retropie() {
     $USER_HOME/RetroPie-Setup/retropie_packages.sh samba
     $USER_HOME/RetroPie-Setup/retropie_packages.sh samba install_shares
     chown -R $USER:$USER $USER_HOME/RetroPie-Setup
+    echo "Done."
+    sleep 2
 }
 
 # Add Retroarch Shaders from official repository
@@ -77,6 +85,8 @@ function add_retroarch_shaders() {
     # Remove git repository from shader dir
     rm -rf /opt/retropie/configs/all/retroarch/shaders/.git
     chown -R $USER:$USER /opt/retropie/configs
+    echo "Done."
+    sleep 2
 }
 
 # Install latest Intel video drivers
@@ -86,6 +96,8 @@ function install_latest_intel_drivers() {
     echo "--------------------------------------------"
     add-apt-repository -y ppa:ubuntu-x-swat/updates
     apt-get update && apt-get -y upgrade
+    echo "Done."
+    sleep 2
 }
 
 # Install MESA Vulkan drivers
@@ -94,6 +106,8 @@ function install_vulkan() {
     echo "- Installing Vulkan"
     echo "--------------------------------------------"
     apt-get -y install mesa-vulkan-drivers
+    echo "Done."
+    sleep 2
 }
 
 # Hide Boot Messages
@@ -116,6 +130,8 @@ function hide_boot_messages() {
     # Disable motd
     touch $USER_HOME/.hushlogin
     chown $USER:$USER $USER_HOME/.hushlogin
+    echo "Done."
+    sleep 2
 }
 
 # Configure 'pi' user to autologin
@@ -130,6 +146,8 @@ ExecStart=
 ExecStart=-/sbin/agetty --skip-login --noissue --autologin $USER %I \$TERM
 Type=idle
 EOF
+    echo "Done."
+    sleep 2
 }
 
 # Enable Plymouth Splash Screen
@@ -144,6 +162,8 @@ function enable_plymouth_theme() {
     update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth /usr/share/plymouth/themes/$PLYMOUTH_THEME/$PLYMOUTH_THEME.plymouth 10
     update-alternatives --set default.plymouth /usr/share/plymouth/themes/$PLYMOUTH_THEME/$PLYMOUTH_THEME.plymouth
     update-initramfs -u
+    echo "Done."
+    sleep 2
 }
 
 # Hide Openbox Windows and reduce visibility of terminal
@@ -181,6 +201,8 @@ EOF
     rm /tmp/rc.xml.applications
     sed -e 's/<keepBorder>yes<\/keepBorder>/<keepBorder>no<\/keepBorder>/g' -i $USER_HOME/.config/openbox/rc.xml
     chown -R $USER:$USER $USER_HOME/.config
+    echo "Done."
+    sleep 2
 }
 
 # Start X as soon as autologin is complete
@@ -199,6 +221,8 @@ if [[ -z \$DISPLAY ]] && [[ \$(tty) = /dev/tty1 ]]; then
 fi
 EOF
     chown $USER:$USER $USER_HOME/.bash_profile
+    echo "Done."
+    sleep 2
 }
 
 # Autostart Openbox Applications
@@ -224,6 +248,8 @@ function autostart_openbox_apps() {
 ###############################################################################
 gnome-terminal --full-screen --hide-menubar -- emulationstation --no-splash
 EOF
+    echo "Done."
+    sleep 2
 }
 
 # Install Latest Nvidia Drivers
@@ -234,6 +260,8 @@ function install_latest_nvidia_drivers() {
     apt-get -y install ubuntu-drivers-common
     add-apt-repository -y ppa:graphics-drivers/ppa
     ubuntu-drivers autoinstall
+    echo "Done."
+    sleep 2
 }
 
 # Disable screen blanking (only happens outside of EmulationStation)
@@ -244,6 +272,8 @@ function disable_screen_blanking() {
     echo "- after a short period of activity"
     echo "--------------------------------------------"
     sed -i '1 i\xset s off && xset -dpms' $USER_HOME/.xsession
+    echo "Done."
+    sleep 2
 }
 
 # Change GRUB Graphics Mode to higher resolution
@@ -258,6 +288,8 @@ function change_grub_gfxmode() {
     echo "--------------------------------------------"
     sed -i 's/#GRUB_GFXMODE=.*/GRUB_GFXMODE=1920x1080x32/g' /etc/default/grub
     update-grub
+    echo "Done."
+    sleep 2
 }
 
 # Fix permissions function recursively on $USER_HOME directory
@@ -267,6 +299,8 @@ function fix_home_permissions() {
     echo "- Change owner to $USER on all files and directories under $USER_HOME"
     echo "--------------------------------------------"
     chown -R $USER:$USER $USER_HOME/
+    echo "Done."
+    sleep 2
 }
 
 # Cleanup unneeded packages
@@ -276,6 +310,8 @@ function cleanup_unneeded_packages() {
     echo "--------------------------------------------"
     apt-get update && apt-get -y upgrade
     apt-get -y autoremove
+    echo "Done."
+    sleep 2
 }
 
 # Offer to restart system after script has run
@@ -284,7 +320,7 @@ function restart_system_prompt() {
     echo "- Installation has completed."
     echo "- Console output stored under retropie_setup_ubuntu.log"
     echo "--------------------------------------------"
-    read -p "Reboot the system now? " -n 1 -r
+    read -p "Reboot the system now? (y/n) " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]
     then
@@ -301,6 +337,8 @@ function download_retropie_only() {
     cd $USER_HOME
     git clone --depth=1 https://github.com/RetroPie/RetroPie-Setup.git
     chown -R $USER:$USER $USER_HOME/RetroPie-Setup
+    echo "Done."
+    sleep 2
 }
 
 # Force this script to run as root

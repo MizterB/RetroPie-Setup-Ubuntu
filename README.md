@@ -82,6 +82,7 @@ added optional functions (not enabled by default) for:
 - downloading retropie only (you need to comment out executing install_retropie in order to use this)
 ### Misc:
 - added logging at top of file so console output is stored as retropie_setup_ubuntu.log when complete
+- add short confirmation after each function is run
 - reordered functions to match the order they execute in
 - reordered the execution of functions to resolve a couple of minor issues
 - add titles to all functions to tidy up a bit, add additional descriptions/info
