@@ -5,6 +5,8 @@ USER_HOME=/home/$USER
 
 PLYMOUTH_THEME=retropie-pacman
 
+LOG_FILE=retropie_setup_ubuntu.log
+
 RETROPIE_CORE_DEPENDS=(
     xorg openbox pulseaudio alsa-utils menu libglib2.0-bin python-xdg
     at-spi2-core libglib2.0-bin dbus-x11 git dialog unzip xmlstarlet
@@ -12,6 +14,15 @@ RETROPIE_CORE_DEPENDS=(
 RETROPIE_EXTRA_DEPENDS=(
     openssh-server xdg-utils unclutter
 )
+
+# Output to both console and log file
+function enable_logging() {
+    echo "--------------------------------------------"
+    echo "- Output console to log file"
+    echo "--------------------------------------------"
+    touch $LOG_FILE
+    exec > >(tee $LOG_FILE) 2>&1
+}
 
 # Add user to sudoers file and disable password prompt
 function disable_sudo_password() {
@@ -267,6 +278,20 @@ function cleanup_unneeded_packages() {
     apt-get -y autoremove
 }
 
+# Offer to restart system after script has run
+function restart_system_prompt() {
+    echo "--------------------------------------------"
+    echo "- Installation has completed."
+    echo "- Console output stored under retropie_setup_ubuntu.log"
+    echo "--------------------------------------------"
+    read -p "Reboot the system now? " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        reboot
+    fi
+}
+
 # Download RetroPie only - do not install
 function download_retropie_only() {
     echo "--------------------------------------------"
@@ -282,6 +307,7 @@ function download_retropie_only() {
 [ `whoami` = root ] || { sudo "$0" "$@"; exit $?; }
 
 # Execute OS Steps and dependencies
+enable_logging
 disable_sudo_password
 install_retropie_dependencies
 install_retropie
@@ -303,6 +329,7 @@ change_grub_gfxmode
 # Final cleanup
 fix_home_permissions
 cleanup_unneeded_packages
+restart_system_prompt
 
 # retropie download only, do not install it
 # comment out the install_retropie function above and uncomment the below function to use this

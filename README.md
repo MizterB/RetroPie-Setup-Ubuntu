@@ -54,32 +54,34 @@ If you are familiar with the use of Preseed files to automate Ubuntu installs (n
 #### function install_retropie_dependencies
 - remove -no-install-recommends as having this causes a blank screen on boot for nvidia cards when using a proprietary driver
 #### function add_retroarch_shaders
- - add line of code to remove the 'pi' centered shaders directory installed by RetroPie-Setup
- - recreate the shaders directory afresh
- - add chown command at the end of the function to make sure everything under /opt/retropie/configs is owned by $USER
+- add line of code to remove the 'pi' centered shaders directory installed by RetroPie-Setup
+- recreate the shaders directory afresh
+- add chown command at the end of the function to make sure everything under /opt/retropie/configs is owned by $USER
 #### function hide_boot_messages
- - improve logic on sed command so instead of relying on GRUB_CMDLINE_LINUX_DEFAULT having the value "quiet" or "" to make the changes needed, now it will replace whatever exists in the quotes with the intended attributes.
+- improve logic on sed command so instead of relying on GRUB_CMDLINE_LINUX_DEFAULT having the value "quiet" or "" to make the changes needed, now it will replace whatever exists in the quotes with the intended attributes.
 #### function enable_plymouth_theme
- - remove -no-install-recommends just in case it causes issues.
+- remove -no-install-recommends just in case it causes issues.
 #### function hide_openbox_windows
- - remove $(cat $USER_HOME/.bash_profile) just before EOF, as this causes the 'startx' code to appear twice in .bash_profile (once at the top, and once below the gnome-terminal commands)
- - reorder this function so it takes place before enable_autostart_xwindows - this ensures that the gnome-terminal code is run before startx is called
- - changed chown command so it changes ownership to $USER from .config recursively instead of .config/openbox - this resolves an issue where .config/dconf (which gets created when gnome-terminal is first launched) is incorrectly owned by root - this then causes DCONF console errors for the gnome-terminal customisation when .bash_profile is called, resulting in no customisation happening because it cannot write to the file correctly (presumably because it is owned by root). Changing the chown command totally resolves this problem, resulting in fully customised black and green terminal with no bars etc.
+- remove $(cat $USER_HOME/.bash_profile) just before EOF, as this causes the 'startx' code to appear twice in .bash_profile (once at the top, and once below the gnome-terminal commands)
+- reorder this function so it takes place before enable_autostart_xwindows - this ensures that the gnome-terminal code is run before startx is called
+- changed chown command so it changes ownership to $USER from .config recursively instead of .config/openbox - this resolves an issue where .config/dconf (which gets created when gnome-terminal is first launched) is incorrectly owned by root - this then causes DCONF console errors for the gnome-terminal customisation when .bash_profile is called, resulting in no customisation happening because it cannot write to the file correctly (presumably because it is owned by root). Changing the chown command totally resolves this problem, resulting in fully customised black and green terminal with no bars etc.
 #### function enable_autostart_xwindows
- - change ~/ on several lines to $USER_HOME/ to match other functions
+- change ~/ on several lines to $USER_HOME/ to match other functions
 #### function autostart_openbox_apps
- - changed chown command to /opt/retropie/configs recursively instead of just changing ownership on autostart.sh, otherwise some of the directories get owned by root again. opt/retropie/configs and all files/folders beneath should be owned by $USER
+- changed chown command to /opt/retropie/configs recursively instead of just changing ownership on autostart.sh, otherwise some of the directories get owned by root again. opt/retropie/configs and all files/folders beneath should be owned by $USER
 #### function install_vulkan
- - remove -no-install-recommends just in case it causes issues
+- remove -no-install-recommends just in case it causes issues
 #### New Functions:
 added optional functions (not enabled by default) for:
- - installing the latest nvidia driver
- - disabling screen blanking
- - changing the GRUB graphics mode to 1920x1080x32 for nicer splash (if supported)
- - final apt update/upgrade and cleanup unneeded packages (autoremove)
- - fix permissions function which catches any potential snags where folders or files under $USER_HOME may get owned by root.
- - downloading retropie only (you need to comment out executing install_retropie in order to use this)
+- installing the latest nvidia driver
+- disabling screen blanking
+- changing the GRUB graphics mode to 1920x1080x32 for nicer splash (if supported)
+- final apt update/upgrade and cleanup unneeded packages (autoremove)
+- offer to reboot once last function is completed
+- fix permissions function which catches any potential snags where folders or files under $USER_HOME may get owned by root.
+- downloading retropie only (you need to comment out executing install_retropie in order to use this)
 #### Misc:
+- added logging at top of file so console output is stored as retropie_setup_ubuntu.log when complete
 - reordered functions to match the order they execute in
 - reordered the execution of functions to resolve a couple of minor issues
 - add titles to all functions to tidy up a bit, add additional descriptions/info
