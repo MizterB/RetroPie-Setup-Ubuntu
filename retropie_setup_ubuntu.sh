@@ -199,7 +199,7 @@ function autostart_openbox_apps() {
     mkdir -p $USER_HOME/.config/openbox
     echo 'unclutter -idle 0.01 -root' >> $USER_HOME/.config/openbox/autostart
     echo '/opt/retropie/configs/all/autostart.sh' >> $USER_HOME/.config/openbox/autostart
-    chown -R $USER:$USER $USER_HOME/.config
+    chown -R $USER:$USER $USER_HOME/.config/openbox
     # Create RetroPie autostart
     mkdir -p /opt/retropie/configs/all
     touch /opt/retropie/configs/all/autostart.sh
