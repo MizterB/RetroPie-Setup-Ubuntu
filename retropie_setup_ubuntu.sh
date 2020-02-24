@@ -26,12 +26,13 @@ function enable_logging() {
     sleep 2
 }
 
-# Add user to sudoers file and disable password prompt
+# Create file in sudoers.d directory and disable password prompt
 function disable_sudo_password() {
     echo "--------------------------------------------"
     echo "- Disabling the sudo password prompt"
     echo "--------------------------------------------"
-    echo "$USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+    echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/$USER-no-password-prompt
+    chmod 0440 /etc/sudoers.d/$USER-no-password-prompt
     echo "Done."
     sleep 2
 }
@@ -52,11 +53,13 @@ function install_retropie() {
     echo "--------------------------------------------"
     echo "- Installing RetroPie"
     echo "--------------------------------------------"
-    # Get Retropie Setup script and perform a basic install with Samba
-    # NOTE: Installing the 'core' packages individually creates issues, use basic_install instead
+    # Get Retropie Setup script and perform an install of core packages only (no emulators)
     cd $USER_HOME
     git clone --depth=1 https://github.com/RetroPie/RetroPie-Setup.git
-    $USER_HOME/RetroPie-Setup/retropie_packages.sh setup basic_install
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh retroarch
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh emulationstation 
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh retropiemenu
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh runcommand
     $USER_HOME/RetroPie-Setup/retropie_packages.sh samba
     $USER_HOME/RetroPie-Setup/retropie_packages.sh samba install_shares
     chown -R $USER:$USER $USER_HOME/RetroPie-Setup
@@ -292,15 +295,16 @@ function change_grub_gfxmode() {
     sleep 2
 }
 
-# Download RetroPie only - do not install
-function download_retropie_only() {
+# Remove “error: XDG_RUNTIME_DIR not set in the environment” CLI error when exiting Retroarch from the RetroPie Setup screen within ES:
+function fix_xdg_error() {
     echo "--------------------------------------------"
-    echo "- Downloading RetroPie"
+    echo "- Remove “error: XDG_RUNTIME_DIR not set in the environment”"
+    echo "- CLI error when exiting Retroarch from the RetroPie Setup screen within ES"
+    echo "- "
+    echo "- Create file in sudoers.d directory to keep environment variable"
     echo "--------------------------------------------"
-    # Get Retropie Setup script
-    cd $USER_HOME
-    git clone --depth=1 https://github.com/RetroPie/RetroPie-Setup.git
-    chown -R $USER:$USER $USER_HOME/RetroPie-Setup
+    echo 'Defaults	env_keep +="XDG_RUNTIME_DIR"' | sudo tee /etc/sudoers.d/keep-xdg-environment-variable
+    chmod 0440 /etc/sudoers.d/keep-xdg-environment-variable
     echo "Done."
     sleep 2
 }
@@ -360,18 +364,10 @@ enable_autostart_xwindows
 autostart_openbox_apps
 
 # Optional steps (uncomment as needed)
-install_latest_nvidia_drivers
-disable_screen_blanking
-change_grub_gfxmode
-
-
-# retropie download only (do not install)
-# to use, comment out the install_retropie AND the add_retroarch_shaders function above to prevent install
-# then uncomment the below function
-#
-# useful if you want to install retropie components / emulators yourself rather than run a basic install
-#
-#download_retropie_only
+#install_latest_nvidia_drivers
+#disable_screen_blanking
+#change_grub_gfxmode
+#fix_xdg_error
 
 # Final cleanup
 fix_home_permissions

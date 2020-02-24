@@ -51,8 +51,12 @@ If you are familiar with the use of Preseed files to automate Ubuntu installs (n
 ## CHANGELOG
 ### 20200222
 ### Existing Functions:
+#### function disable_sudo_password
+- tweak logic so it creates a file in the /etc/sudoers.d directory to disable sudo password, rather than editing sudoers directly (more dangerous and can be overwritten by updates)
 #### function install_retropie_dependencies
 - remove -no-install-recommends as having this causes a blank screen on boot for nvidia cards when using a proprietary driver
+#### function install_retropie
+- reinstated the core module install method (retroarch, emulationstation, retropiemenu, runcommand, plus samba)
 #### function add_retroarch_shaders
 - add line of code to remove the 'pi' centered shaders directory installed by RetroPie-Setup
 - recreate the shaders directory afresh
@@ -76,6 +80,7 @@ added optional functions (not enabled by default) for:
 - installing the latest nvidia driver
 - disabling screen blanking
 - changing the GRUB graphics mode to 1920x1080x32 for nicer splash (if supported)
+- removing “error: XDG_RUNTIME_DIR not set in the environment” CLI error when exiting Retroarch from the RetroPie Setup screen within ES
 - final apt update/upgrade and cleanup unneeded packages (autoremove)
 - offer to reboot once last function is completed
 - fix permissions function which catches any potential snags where folders or files under $USER_HOME may get owned by root.
