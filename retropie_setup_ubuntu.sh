@@ -57,7 +57,7 @@ function install_retropie() {
     cd $USER_HOME
     git clone --depth=1 https://github.com/RetroPie/RetroPie-Setup.git
     $USER_HOME/RetroPie-Setup/retropie_packages.sh retroarch
-    $USER_HOME/RetroPie-Setup/retropie_packages.sh emulationstation 
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh emulationstation
     $USER_HOME/RetroPie-Setup/retropie_packages.sh retropiemenu
     $USER_HOME/RetroPie-Setup/retropie_packages.sh runcommand
     $USER_HOME/RetroPie-Setup/retropie_packages.sh samba
@@ -285,7 +285,7 @@ function change_grub_gfxmode() {
     echo "--------------------------------------------"
     echo "- Change GRUB Graphics Mode from default"
     echo "- Only use if supported!"
-    echo "- Run vbeinfo or videoinfo from GRUB"
+    echo "- Run vbeinfo (legacy) or videoinfo (UEFI) from GRUB"
     echo "- command line to see supported modes"
     echo "- Change the resolution to one which is supported"
     echo "--------------------------------------------"
@@ -300,7 +300,7 @@ function fix_xdg_error() {
     echo "--------------------------------------------"
     echo "- Remove “error: XDG_RUNTIME_DIR not set in the environment”"
     echo "- CLI error when exiting Retroarch from the RetroPie Setup screen within ES"
-    echo "- "
+    echo "-"
     echo "- Create file in sudoers.d directory to keep environment variable"
     echo "--------------------------------------------"
     echo 'Defaults	env_keep +="XDG_RUNTIME_DIR"' | sudo tee /etc/sudoers.d/keep-xdg-environment-variable
