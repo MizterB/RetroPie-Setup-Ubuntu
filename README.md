@@ -1,7 +1,9 @@
 # RetroPie-Setup-Ubuntu
 
 Forked from https://github.com/MizterB/RetroPie-Setup-Ubuntu
+
 All credits to MizterB for creating this excellent script.
+
 This version adds various new functions, improves/changes existing ones (see changelog below) and logs the output. Tested on Ubuntu Server 18.04.4.
 
 If using any optional functions, you should adapt the code according to suit your display, in order to avoid issues (eg. xrandr_force_resolution, change_grub_gfxmode)
