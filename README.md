@@ -1,10 +1,19 @@
 # RetroPie-Setup-Ubuntu
+
+Forked from https://github.com/MizterB/RetroPie-Setup-Ubuntu
+All credits to MizterB for creating this excellent script.
+This version adds various new functions, improves/changes existing ones (see changelog below) and logs the output. Tested on Ubuntu Server 18.04.4.
+
+If using any optional functions, you should adapt the code according to suit your display, in order to avoid issues (eg. xrandr_force_resolution, change_grub_gfxmode)
+
+---
+
 Script to automate the installation on RetroPie on Ubuntu, with the end-state user experience nearly identical to a Raspberry Pi installation, but with the power and flexibility of x86.
 
 This script was inspired by feedback provided on the [RetroPie forums](https://retropie.org.uk/forum/topic/18810/retropie-installation-on-ubuntu-server-x64-18-04-1), and does the following:
 - Disables sudo password prompts
 - Installs the minimal OS dependecies needed to install OpenBox and run RetroPie
-- Installs the RetroPie 'core' modules (it does not install any emaulators - you can run Retropie Setup later to configure as needed)
+- Installs the RetroPie 'core' modules (it does not install any emulators - you can run Retropie Setup later to configure as needed)
 - Hides all GRUB and kernel text output during startup/shutdown
 - Applies the RetroPie-PacMan Plymouth theme to run during startup / shutdown
 - Enables autologin and boots directly into OpenBox / EmulationStation
@@ -78,13 +87,14 @@ If you are familiar with the use of Preseed files to automate Ubuntu installs (n
 ### New Functions:
 added optional functions (not enabled by default) for:
 - installing the latest nvidia driver
+- install 'inxi' package and enable updates - can be used for checking hardware and system information
 - disabling screen blanking
+- force HDMI-0 to 1080p after startup (should be configured accordingly to suit output and resolution)
 - changing the GRUB graphics mode to 1920x1080x32 for nicer splash (if supported)
 - removing “error: XDG_RUNTIME_DIR not set in the environment” CLI error when exiting Retroarch from the RetroPie Setup screen within ES
 - final apt update/upgrade and cleanup unneeded packages (autoremove)
 - offer to reboot once last function is completed
 - fix permissions function which catches any potential snags where folders or files under $USER_HOME may get owned by root.
-- downloading retropie only (you need to comment out executing install_retropie in order to use this)
 ### Misc:
 - added logging at top of file so console output is stored as retropie_setup_ubuntu.log when complete
 - add short confirmation after each function is run

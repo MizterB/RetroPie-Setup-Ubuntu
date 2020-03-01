@@ -18,11 +18,10 @@ RETROPIE_EXTRA_DEPENDS=(
 # Output to both console and log file
 function enable_logging() {
     echo "--------------------------------------------"
-    echo "- Output console to log file"
+    echo "- Output will be logged to retropie_setup_ubuntu.log"
     echo "--------------------------------------------"
     touch $LOG_FILE
     exec > >(tee $LOG_FILE) 2>&1
-    echo "Done."
     sleep 2
 }
 
@@ -267,6 +266,21 @@ function install_latest_nvidia_drivers() {
     sleep 2
 }
 
+# Install and enable updates on 'inxi' package - used for checking hardware and system information
+# Command 'inxi -G' useful for querying video card driver versions
+function update_inxi_tool() {
+    echo "--------------------------------------------"
+    echo "- Install and enable updates on 'inxi' package"
+    echo "- Used for checking hardware and system information"
+    echo "- Command 'inxi -G' useful for querying video card driver versions"
+    echo "--------------------------------------------"
+    apt-get -y install inxi
+    sed -i 's/B_ALLOW_UPDATE=false/B_ALLOW_UPDATE=true/g' /etc/inxi.conf
+    inxi -U
+    echo "Done."
+    sleep 2
+}
+
 # Disable screen blanking (only happens outside of EmulationStation)
 function disable_screen_blanking() {
     echo "--------------------------------------------"
@@ -275,6 +289,20 @@ function disable_screen_blanking() {
     echo "- after a short period of activity"
     echo "--------------------------------------------"
     sed -i '1 i\xset s off && xset -dpms' $USER_HOME/.xsession
+    echo "Done."
+    sleep 2
+}
+
+# Force HDMI resolution to 1080p after startup (advised if using 4k TV)
+# Change --output and --mode if required
+# Run xrandr from a terminal directly on the machine to find output name supported display modes
+function xrandr_force_resolution() {
+    echo "--------------------------------------------"
+    echo "- Force HDMI resolution to 1080p after startup"
+    echo "- (advised if using 4k TV)"
+    echo "- after a short period of activity"
+    echo "--------------------------------------------"
+    sed -i '1 i\xrandr --output HDMI-0 --mode 1920x1080' $USER_HOME/.xsession
     echo "Done."
     sleep 2
 }
@@ -335,7 +363,7 @@ function cleanup_unneeded_packages() {
 function restart_system_prompt() {
     echo "--------------------------------------------"
     echo "- Installation has completed."
-    echo "- Console output stored under retropie_setup_ubuntu.log"
+    echo "- Output has been logged to retropie_setup_ubuntu.log"
     echo "--------------------------------------------"
     read -p "Reboot the system now? (y/n) " -n 1 -r
     echo
@@ -365,7 +393,9 @@ autostart_openbox_apps
 
 # Optional steps (uncomment as needed)
 #install_latest_nvidia_drivers
+#update_inxi_tool
 #disable_screen_blanking
+#xrandr_force_resolution
 #change_grub_gfxmode
 #fix_xdg_error
 
