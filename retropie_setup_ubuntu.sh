@@ -98,6 +98,7 @@ function hide_boot_messages() {
     echo "- Hiding boot messages"
     echo "--------------------------------------------"
     # Hide kernel messages and blinking cursor via GRUB
+    sed -i -e 's/GRUB_CMDLINE_LINUX_DEFAULT="splash quiet"/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash vt.global_cursor_default=0"/g' /etc/default/grub
     sed -i -e 's/GRUB_CMDLINE_LINUX_DEFAULT="quiet"/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash vt.global_cursor_default=0"/g' /etc/default/grub
     sed -i -e 's/GRUB_CMDLINE_LINUX_DEFAULT=""/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash vt.global_cursor_default=0"/g' /etc/default/grub
     update-grub
