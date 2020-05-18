@@ -152,6 +152,17 @@ EOF
     sleep 2
 }
 
+# Change the default runlevel to multi-user, in order to disable GDM
+# Needed for 20.04
+function enable_runlevel_multiuser () {
+    echo "--------------------------------------------"
+    echo "- Enable multi-user runlevel"
+    echo "--------------------------------------------"
+    systemctl set-default multi-user
+    echo "Done."
+    sleep 2
+}
+
 # Enable Plymouth Splash Screen
 function enable_plymouth_theme() {
     echo "--------------------------------------------"
@@ -386,6 +397,7 @@ install_latest_intel_drivers
 install_vulkan
 hide_boot_messages
 enable_autologin_tty
+enable_runlevel_multiuser
 enable_plymouth_theme
 hide_openbox_windows
 enable_autostart_xwindows
