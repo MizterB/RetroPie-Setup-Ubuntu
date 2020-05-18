@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # Computed variables
-USER="$(whoami)"
+USER="$SUDO_USER"
 USER_HOME="/home/$USER"
 SCRIPT_DIR="$(pwd)"
 LOG_FILE="$SCRIPT_DIR/$(basename $0 .sh).log"
