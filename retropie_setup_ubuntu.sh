@@ -357,7 +357,7 @@ function fix_quirks() {
 
     echo -e "Done\n\n"
     sleep 2    
-
+}
 
 # Change 
 function set_resolution_xwindows() {
