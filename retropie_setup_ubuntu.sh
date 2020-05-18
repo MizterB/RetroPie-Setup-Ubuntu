@@ -1,16 +1,13 @@
 #! /bin/bash
 
-# User-configurable variables
-USER="pi"
-PLYMOUTH_THEME="retropie-pacman"
-
 # Computed variables
+USER="$(whoami)"
 USER_HOME="/home/$USER"
 SCRIPT_DIR="$(pwd)"
 LOG_FILE="$SCRIPT_DIR/$(basename $0 .sh).log"
 
 # Minimal depedencies to install RetroPie on Ubuntu
-RETROPIE_CORE_DEPENDS=(
+RETROPIE_DEPENDS=(
     xorg openbox pulseaudio alsa-utils menu libglib2.0-bin python-xdg
     at-spi2-core libglib2.0-bin dbus-x11 git dialog unzip xmlstarlet
 )
@@ -20,9 +17,10 @@ RETROPIE_CORE_DEPENDS=(
 # openssh-server      Remote administration, copy/paste
 # xdg-utils           Eliminates 'xdg-screensaver not found' error
 # unclutter           Hides mouse cursor when not being used
+# inxi                Queries video driver information
 #--------------------------------------------------------------------------------
-RETROPIE_EXTRA_DEPENDS=(
-    openssh-server xdg-utils unclutter
+EXTRA_TOOLS=(
+    openssh-server xdg-utils unclutter inxi
 )
 
 
@@ -33,7 +31,6 @@ function enable_logging() {
     echo "--------------------------------------------------------------------------------"
     touch $LOG_FILE
     exec > >(tee $LOG_FILE) 2>&1
-    echo -e "Done\n\n"
     sleep 2
 }
 
@@ -44,7 +41,7 @@ function install_retropie_dependencies() {
     echo "| Updating OS packages and installing RetroPie dependencies"
     echo "--------------------------------------------------------------------------------"
     apt-get update && apt-get -y upgrade
-    apt-get -y install ${RETROPIE_CORE_DEPENDS[@]} ${RETROPIE_EXTRA_DEPENDS[@]}
+    apt-get -y install ${RETROPIE_DEPENDS[@]}
     echo -e "Done\n\n"
     sleep 2
 }
@@ -119,6 +116,19 @@ function install_latest_intel_drivers() {
 }
 
 
+# Install the latest Nvidia video drivers
+function install_latest_nvidia_drivers() {
+    echo "--------------------------------------------------------------------------------"
+    echo "- Installing the latest Nvidia video drivers"
+    echo "--------------------------------------------------------------------------------"
+    apt-get -y install ubuntu-drivers-common
+    add-apt-repository -y ppa:graphics-drivers/ppa
+    ubuntu-drivers autoinstall
+    echo -e "Done\n\n"
+    sleep 2
+}
+
+
 # Install MESA Vulkan drivers
 function install_vulkan() {
     echo "--------------------------------------------------------------------------------"
@@ -132,6 +142,14 @@ function install_vulkan() {
 
 # Enable Plymouth Splash Screen
 function enable_plymouth_theme() {
+    if [[ -z "$1" ]]; then
+        echo "--------------------------------------------------------------------------------"
+        echo "| Skipping Plymouth boot splash because no theme name was provided"
+        echo "--------------------------------------------------------------------------------"
+        echo -e "Skipped\n\n"
+        return 255
+    fi
+    $PLYMOUTH_THEME=$1
     echo "--------------------------------------------------------------------------------"
     echo "| Installing Plymouth boot splash and enabling theme '$PLYMOUTH_THEME'"
     echo "--------------------------------------------------------------------------------"
@@ -290,99 +308,131 @@ EOF
 }
 
 
-# Install the latest Nvidia video drivers
-function install_latest_nvidia_drivers() {
+# Install and configure extra tools
+function install_extra_tools() {
     echo "--------------------------------------------------------------------------------"
-    echo "- Installing the latest Nvidia video drivers"
+    echo "| Installing the following tools to improve usability:"
+    echo "| ${EXTRA_TOOLS[@]}"
     echo "--------------------------------------------------------------------------------"
-    apt-get -y install ubuntu-drivers-common
-    add-apt-repository -y ppa:graphics-drivers/ppa
-    ubuntu-drivers autoinstall
+    apt-get update
+    apt-get -y install ${EXTRA_TOOLS[@]}
+
+    # Configure 'inxi' if it was installed
+    if [[ -x "$(command -v inxi)" ]]; then
+        echo "--------------------------------------------------------------------------------"
+        echo "| Enabling updates on the 'inxi' package", which is 
+        echo "| used for checking hardware and system information"
+        echo "| Command 'inxi -G' is useful for querying video card driver versions"
+        echo "--------------------------------------------------------------------------------"
+        sed -i 's/B_ALLOW_UPDATE=false/B_ALLOW_UPDATE=true/g' /etc/inxi.conf
+        inxi -U
+    fi
+    
     echo -e "Done\n\n"
     sleep 2
 }
 
 
-# Install and enable updates on 'inxi' package - used for checking hardware and system information
-# Command 'inxi -G' useful for querying video card driver versions
-function update_inxi_tool() {
+# Install and configure extra tools
+function fix_quirks() {
     echo "--------------------------------------------------------------------------------"
-    echo "| Install and enable updates on 'inxi' package"
-    echo "| Used for checking hardware and system information"
-    echo "| Command 'inxi -G' useful for querying video card driver versions"
+    echo "| Fixing any known quirks"
     echo "--------------------------------------------------------------------------------"
-    apt-get -y install inxi
-    sed -i 's/B_ALLOW_UPDATE=false/B_ALLOW_UPDATE=true/g' /etc/inxi.conf
-    inxi -U
-    echo "Done."
-    sleep 2
-}
 
-
-# Disable screen blanking (only happens outside of EmulationStation)
-function disable_screen_blanking() {
+    # XDG_RUNTIME_DIR
+    echo "--------------------------------------------------------------------------------"
+    echo "| Remove 'error: XDG_RUNTIME_DIR not set in the environment' CLI error"
+    echo "| when exiting Retroarch from the RetroPie Setup screen within ES"
+    echo "| by creating a file in sudoers.d directory to keep environment variable"
+    echo "--------------------------------------------------------------------------------"
+    echo 'Defaults	env_keep +="XDG_RUNTIME_DIR"' | sudo tee /etc/sudoers.d/keep-xdg-environment-variable
+    chmod 0440 /etc/sudoers.d/keep-xdg-environment-variable
+    
+    # Screen blanking
     echo "--------------------------------------------------------------------------------"
     echo "| Disable screen blanking (only happens outside of EmulationStation)"
     echo "| This prevents the display from doing any ‘screen blanking’ due to inactivity"
     echo "--------------------------------------------------------------------------------"
     sed -i '1 i\xset s off && xset -dpms' $USER_HOME/.xsession
+
     echo -e "Done\n\n"
+    sleep 2    
+
+
+# Change 
+function set_resolution_xwindows() {
+    if [[ -z "$1" ]]; then
+        echo "--------------------------------------------------------------------------------"
+        echo "| Skipping X Windows display resolution because a target resolution was not provided"
+        echo "| Run 'xrandr --display :0' to see available resolutions"
+        echo "--------------------------------------------------------------------------------"
+        echo -e "Skipped\n\n"
+        return 255
+    fi
+
+    TARGET_RESOLUTION=$1
+    CONNECTED_OUTPUT=$(xrandr --display :0 | grep " connected " | awk '{ print $1 }')
+    CURRENT_RESOLUTION=$(xrandr --display :0 | awk 'FNR==1{split($0,a,", "); print a[2]}' | awk '{gsub("current ","");gsub(" x ", "x");print}')
+    if $(xrandr --display :0 | grep -q $TARGET_RESOLUTION); then
+        echo "--------------------------------------------------------------------------------"
+        echo "| Setting X Windows display '$CONNECTED_OUTPUT' to '$TARGET_RESOLUTION'"
+        echo "| This value is stored in '$USER_HOME/.xsession'"
+        echo "--------------------------------------------------------------------------------"
+        sed -i '1 i\xrandr --output $CONNECTED_OUTPUT --mode $TARGET_RESOLUTION' $USER_HOME/.xsession
+        echo -e "Done\n\n"
+    else
+        echo "--------------------------------------------------------------------------------"
+        echo "| Skipping X Windows display resolution"
+        echo "| $TARGET_RESOLUTION is not available on $CONNECTED_OUTPUT.  Remaining at $CURRENT_RESOLUTION."
+        echo "--------------------------------------------------------------------------------"
+        echo -e "Skipped\n\n"
+        return 255
+    fi
     sleep 2
 }
 
 
-# Force HDMI resolution to 1080p after startup (advised if using 4k TV)
-# Change --output and --mode if required
-# Run xrandr from a terminal directly on the machine to find output name supported display modes
-function xrandr_force_resolution() {
-    echo "--------------------------------------------------------------------------------"
-    echo "| Force HDMI resolution to 1080p after startup"
-    echo "| (advised if using 4k TV)"
-    echo "| after a short period of activity"
-    echo "--------------------------------------------------------------------------------"
-    sed -i '1 i\xrandr --output HDMI-0 --mode 1920x1080' $USER_HOME/.xsession
-    echo -e "Done\n\n"
-    sleep 2
-}
+# Change GRUB graphics mode - typically to 1080p (1920x1080x32)
+function set_resolution_grub() {
+    if [[ -z "$1" ]]; then
+        echo "--------------------------------------------------------------------------------"
+        echo "| Skipping GRUB resolution change because no mode string was provided"
+        echo "| Run 'vbeinfo' (legacy) or 'videoinfo' (UEFI) from the GRUB command line"
+        echo "| to see the supported modes"
+        echo "--------------------------------------------------------------------------------"
+        echo -e "Skipped\n\n"
+        return 255
+    fi
 
-
-# Change GRUB Graphics Mode to higher resolution
-# Beware using this function!
-function change_grub_gfxmode() {
+    MODE=$1
     echo "--------------------------------------------------------------------------------"
-    echo "| Change GRUB Graphics Mode from default"
+    echo "| **** WARNING ****"
+    echo "| Changing the GRUB graphics mode to '$MODE'"
     echo "| Only use if supported!"
-    echo "| Run vbeinfo (legacy) or videoinfo (UEFI) from GRUB"
-    echo "| command line to see supported modes"
-    echo "| Change the resolution to one which is supported"
+    echo "| Run 'vbeinfo' (legacy) or 'videoinfo' (UEFI) from the GRUB command line"
+    echo "| to see the supported modes"
     echo "--------------------------------------------------------------------------------"
-    sed -i 's/#GRUB_GFXMODE=.*/GRUB_GFXMODE=1920x1080x32/g' /etc/default/grub
-    update-grub
-    echo -e "Done\n\n"
+    read -p "THIS COULD IMPACT YOUR ABILITY TO BOOT THE SYSTEM. ARE YOU SURE YOU WANT TO PROCEED? (y/n) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo "--------------------------------------------------------------------------------"
+        echo "| Setting mode '$MODE' in /etc./default/grub"
+        echo "--------------------------------------------------------------------------------"
+        sed -i 's/#GRUB_GFXMODE=.*/GRUB_GFXMODE=$MODE/g' /etc/default/grub
+        update-grub
+        echo -e "Done\n\n"
+    else
+        echo -e "Skipped\n\n"
+    fi
     sleep 2
 }
 
 
-# Remove “error: XDG_RUNTIME_DIR not set in the environment” CLI error when exiting Retroarch from the RetroPie Setup screen within ES:
-function fix_xdg_error() {
+# Repair any permissions that might have been incorrectly set
+function repair_permissions() {
     echo "--------------------------------------------------------------------------------"
-    echo "| Remove “error: XDG_RUNTIME_DIR not set in the environment”"
-    echo "| CLI error when exiting Retroarch from the RetroPie Setup screen within ES"
-    echo "|"
-    echo "| Create file in sudoers.d directory to keep environment variable"
-    echo "--------------------------------------------------------------------------------"
-    echo 'Defaults	env_keep +="XDG_RUNTIME_DIR"' | sudo tee /etc/sudoers.d/keep-xdg-environment-variable
-    chmod 0440 /etc/sudoers.d/keep-xdg-environment-variable
-    echo -e "Done\n\n"
-    sleep 2
-}
-
-
-# Fix permissions function recursively on $USER_HOME directory
-function fix_home_permissions() {
-    echo "--------------------------------------------------------------------------------"
-    echo "| Fix any snags relating to file/folder permissions underneath $USER_HOME"
-    echo "| Change owner to $USER on all files and directories under $USER_HOME"
+    echo "| Repairing file & folder permissions underneath $USER_HOME"
+    echo "| by changing owner to $USER on all files and directories under $USER_HOME"
     echo "--------------------------------------------------------------------------------"
     chown -R $USER:$USER $USER_HOME/
     echo -e "Done\n\n"
@@ -390,10 +440,10 @@ function fix_home_permissions() {
 }
 
 
-# Cleanup unneeded packages
-function cleanup_unneeded_packages() {
+# Remove unneeded packages
+function remove_unneeded_packages() {
     echo "--------------------------------------------------------------------------------"
-    echo "| Final update and cleanup unneeded packages"
+    echo "| Autoremoving any unneeded packages"
     echo "--------------------------------------------------------------------------------"
     apt-get update && apt-get -y upgrade
     apt-get -y autoremove
@@ -401,18 +451,23 @@ function cleanup_unneeded_packages() {
     sleep 2
 }
 
-# Offer to restart system after script has run
-function restart_system_prompt() {
-    echo "--------------------------------------------------------------------------------"
-    echo "| Installation has completed."
-    echo "| Output has been logged to '$LOG_FILE'"
-    echo "--------------------------------------------------------------------------------"
+# Prompt user for reboot
+function prompt_for_reboot() {
     read -p "Reboot the system now? (y/n) " -n 1 -r
     echo
-    if [[ $REPLY =~ ^[Yy]$ ]]
-    then
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
         reboot
     fi
+}
+
+
+# Final message to user
+function complete_install() {
+    echo "--------------------------------------------------------------------------------"
+    echo "| Installation has completed"
+    echo "| Output has been logged to '$LOG_FILE'"
+    echo "--------------------------------------------------------------------------------"
+    prompt_for_reboot
 }
 
 
@@ -421,7 +476,7 @@ function restart_system_prompt() {
 
 
 #--------------------------------------------------------------------------------
-# INSTALLATION SCRIPT 
+#| INSTALLATION SCRIPT 
 #--------------------------------------------------------------------------------
 #-- Log this script's output
 enable_logging
@@ -432,23 +487,23 @@ install_retroarch_shaders
 disable_sudo_password
 #-- Common video drivers
 install_latest_intel_drivers
+install_latest_nvidia_drivers
 install_vulkan
 #-- Hide text and boot directly into EmulationStation
-enable_plymouth_theme
+enable_plymouth_theme "retropie-pacman"       # See https://github.com/HerbFargus/plymouth-themes.git for other theme names
 hide_boot_messages
 enable_runlevel_multiuser
 enable_autologin_tty
 enable_autostart_xwindows
 hide_openbox_windows
 autostart_openbox_apps
-#-- OPTIONAL STEPS (uncomment as needed)
-install_latest_nvidia_drivers
-update_inxi_tool
-disable_screen_blanking
-xrandr_force_resolution
-change_grub_gfxmode
-fix_xdg_error
+#-- Additional customizations
+install_extra_tools
+fix_quirks
+#-- OPTIONAL STEPS (comment/change as needed)
+set_resolution_xwindows "1920x1080"
+set_resolution_grub "1920x1080x32"           # Run 'vbeinfo' (legacy) or 'videoinfo' (UEFI) from the GRUB command line to see the supported modes
 #-- Final cleanup
-fix_home_permissions
-cleanup_unneeded_packages
-restart_system_prompt
+repair_permissions
+remove_unneeded_packages
+complete_install
