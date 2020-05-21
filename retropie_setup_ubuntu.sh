@@ -149,7 +149,7 @@ function enable_plymouth_theme() {
         echo -e "Skipped\n\n"
         return 255
     fi
-    $PLYMOUTH_THEME=$1
+    PLYMOUTH_THEME=$1
     echo "--------------------------------------------------------------------------------"
     echo "| Installing Plymouth boot splash and enabling theme '$PLYMOUTH_THEME'"
     echo "--------------------------------------------------------------------------------"
@@ -298,12 +298,9 @@ function autostart_openbox_apps() {
     cat << EOF > /opt/retropie/configs/all/autostart.sh
 #! /bin/bash
 
-###############################################################################
-# Start EmulationStation
-###############################################################################
-gnome-terminal --full-screen --hide-menubar -- emulationstation --no-splash
+gnome-terminal --full-screen --hide-menubar -- emulationstation --no-splash         # RPSU_End autostart_openbox_apps
 EOF
-    echo "Done."
+    echo -e "Done\n\n"
     sleep 2
 }
 
@@ -347,6 +344,7 @@ function fix_quirks() {
     echo "--------------------------------------------------------------------------------"
     echo 'Defaults	env_keep +="XDG_RUNTIME_DIR"' | sudo tee /etc/sudoers.d/keep-xdg-environment-variable
     chmod 0440 /etc/sudoers.d/keep-xdg-environment-variable
+    echo -e "\n"
     
     # Screen blanking
     echo "--------------------------------------------------------------------------------"
@@ -354,76 +352,67 @@ function fix_quirks() {
     echo "| This prevents the display from doing any ‘screen blanking’ due to inactivity"
     echo "--------------------------------------------------------------------------------"
     sed -i '1 i\xset s off && xset -dpms' $USER_HOME/.xsession
+    echo -e "\n"
 
     echo -e "Done\n\n"
     sleep 2    
 }
 
-# Change 
-function set_resolution_xwindows() {
-    if [[ -z "$1" ]]; then
-        echo "--------------------------------------------------------------------------------"
-        echo "| Skipping X Windows display resolution because a target resolution was not provided"
-        echo "| Run 'xrandr --display :0' to see available resolutions"
-        echo "--------------------------------------------------------------------------------"
-        echo -e "Skipped\n\n"
-        return 255
-    fi
 
-    TARGET_RESOLUTION=$1
-    CONNECTED_OUTPUT=$(xrandr --display :0 | grep " connected " | awk '{ print $1 }')
-    CURRENT_RESOLUTION=$(xrandr --display :0 | awk 'FNR==1{split($0,a,", "); print a[2]}' | awk '{gsub("current ","");gsub(" x ", "x");print}')
-    if $(xrandr --display :0 | grep -q $TARGET_RESOLUTION); then
-        echo "--------------------------------------------------------------------------------"
-        echo "| Setting X Windows display '$CONNECTED_OUTPUT' to '$TARGET_RESOLUTION'"
-        echo "| This value is stored in '$USER_HOME/.xsession'"
-        echo "--------------------------------------------------------------------------------"
-        sed -i '1 i\xrandr --output $CONNECTED_OUTPUT --mode $TARGET_RESOLUTION' $USER_HOME/.xsession
-        echo -e "Done\n\n"
+# Add the ability to change screen resolution in autostart.sh 
+function set_resolution_xwindows() {
+    echo "--------------------------------------------------------------------------------"
+    echo "| Adding the ability to override the default display resolution"
+    echo "| from the '/opt/retropie/config/all/autostart.sh' script."
+    echo "| Update the PREFERRED_RESOLUTION variable inside the script to change this value."
+    echo "| If not valid, it will gracefully revert to the display's preferred resolution."
+    echo "| This is typically helpful for improving performance by lowering resolution on 4K displays"
+    echo "--------------------------------------------------------------------------------"
+    cat << EOF >> /tmp/set_resolution_xwindows
+
+# RPSU_START set_resolution_xwindows
+# Update the next line to customize the display resolution
+# If will fall back to the display's preferred resolution, if the custom value is invalid 
+PREFERRED_RESOLUTION=1920x1080
+if [[ ! -z \$PREFERRED_RESOLUTION ]]; then
+    current_resolution=\$(xrandr --display :0 | awk 'FNR==1{split(\$0,a,", "); print a[2]}' | awk '{gsub("current ","");gsub(" x ", "x");print}')
+    connected_display=\$(xrandr --display :0 | grep " connected " | awk '{ print \$1 }')
+    if \$(xrandr --display :0 | grep -q \$PREFERRED_RESOLUTION); then
+        xrandr --display :0 --output \$connected_display --mode \$PREFERRED_RESOLUTION &
     else
-        echo "--------------------------------------------------------------------------------"
-        echo "| Skipping X Windows display resolution"
-        echo "| $TARGET_RESOLUTION is not available on $CONNECTED_OUTPUT.  Remaining at $CURRENT_RESOLUTION."
-        echo "--------------------------------------------------------------------------------"
-        echo -e "Skipped\n\n"
-        return 255
+        echo "\$PREFERRED_RESOLUTION is not available on \$connected_display.  Remaining at default resolution of \$current_resolution."
     fi
+fi
+# RPSU_END set_resolution_xwindows
+
+EOF
+    # Insert into autostart.sh after the 1st line (after shebang)
+    sed -i '1r /tmp/set_resolution_xwindows' "/opt/retropie/configs/all/autostart.sh"
+    rm /tmp/set_resolution_xwindows
+    echo -e "Done\n\n"
     sleep 2
 }
 
 
-# Change GRUB graphics mode - typically to 1080p (1920x1080x32)
+# Sets the GRUB graphics mode
+# Takes a valid mode string as a argument, such as "1920x1080x32"
+# If none is provided, a default of 'auto' will be used
 function set_resolution_grub() {
     if [[ -z "$1" ]]; then
-        echo "--------------------------------------------------------------------------------"
-        echo "| Skipping GRUB resolution change because no mode string was provided"
-        echo "| Run 'vbeinfo' (legacy) or 'videoinfo' (UEFI) from the GRUB command line"
-        echo "| to see the supported modes"
-        echo "--------------------------------------------------------------------------------"
-        echo -e "Skipped\n\n"
-        return 255
-    fi
-
-    MODE=$1
-    echo "--------------------------------------------------------------------------------"
-    echo "| **** WARNING ****"
-    echo "| Changing the GRUB graphics mode to '$MODE'"
-    echo "| Only use if supported!"
-    echo "| Run 'vbeinfo' (legacy) or 'videoinfo' (UEFI) from the GRUB command line"
-    echo "| to see the supported modes"
-    echo "--------------------------------------------------------------------------------"
-    read -p "THIS COULD IMPACT YOUR ABILITY TO BOOT THE SYSTEM. ARE YOU SURE YOU WANT TO PROCEED? (y/n) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        echo "--------------------------------------------------------------------------------"
-        echo "| Setting mode '$MODE' in /etc./default/grub"
-        echo "--------------------------------------------------------------------------------"
-        sed -i 's/#GRUB_GFXMODE=.*/GRUB_GFXMODE=$MODE/g' /etc/default/grub
-        update-grub
-        echo -e "Done\n\n"
+        MODES="auto"
     else
-        echo -e "Skipped\n\n"
+        MODES="$1,auto"
     fi
+    echo "--------------------------------------------------------------------------------"
+    echo "| Changing the GRUB graphics mode to '$MODE'"
+    echo "| If this mode is incompatible with your system, GRUB will fall back to 'auto' mode"
+    echo "| Run 'vbeinfo' (legacy, pre-18.04) or 'videoinfo' (UEFI) from the GRUB command line"
+    echo "| to see the supported modes"
+    echo "| This value, 'GRUB_GFXMODE', can be edited in /etc/default/grub"
+    echo "--------------------------------------------------------------------------------"
+    sed -i 's/#GRUB_GFXMODE=.*/GRUB_GFXMODE=$MODES/g' /etc/default/grub
+    update-grub
+    echo -e "Done\n\n"
     sleep 2
 }
 
@@ -474,36 +463,49 @@ function complete_install() {
 # Force this script to run as root
 [ `whoami` = root ] || { sudo "$0" "$@"; exit $?; }
 
-
 #--------------------------------------------------------------------------------
 #| INSTALLATION SCRIPT 
 #--------------------------------------------------------------------------------
-#-- Log this script's output
-enable_logging
-#-- Basic RetroPie install 
-install_retropie_dependencies
-install_retropie
-install_retroarch_shaders
-disable_sudo_password
-#-- Common video drivers
-install_latest_intel_drivers
-install_latest_nvidia_drivers
-install_vulkan
-#-- Hide text and boot directly into EmulationStation
-enable_plymouth_theme "retropie-pacman"       # See https://github.com/HerbFargus/plymouth-themes.git for other theme names
-hide_boot_messages
-enable_runlevel_multiuser
-enable_autologin_tty
-enable_autostart_xwindows
-hide_openbox_windows
-autostart_openbox_apps
-#-- Additional customizations
-install_extra_tools
-fix_quirks
-#-- OPTIONAL STEPS (comment/change as needed)
-set_resolution_xwindows "1920x1080"
-set_resolution_grub "1920x1080x32"           # Run 'vbeinfo' (legacy) or 'videoinfo' (UEFI) from the GRUB command line to see the supported modes
-#-- Final cleanup
-repair_permissions
-remove_unneeded_packages
-complete_install
+# If no arguments are provided
+if [[ -z "$1" ]]; then
+
+    #-- Log this script's output
+    enable_logging
+    #-- Basic RetroPie install 
+    install_retropie_dependencies
+    install_retropie
+    install_retroarch_shaders
+    disable_sudo_password
+    #-- Common video drivers
+    install_latest_intel_drivers
+    install_latest_nvidia_drivers
+    install_vulkan
+    #-- Hide text and boot directly into EmulationStation
+    enable_plymouth_theme "retropie-pacman"       # See https://github.com/HerbFargus/plymouth-themes.git for other theme names
+    hide_boot_messages
+    enable_runlevel_multiuser
+    enable_autologin_tty
+    enable_autostart_xwindows
+    hide_openbox_windows
+    autostart_openbox_apps
+    #-- Additional customizations
+    install_extra_tools
+    fix_quirks
+    #-- OPTIONAL STEPS (comment/change as needed)
+    set_resolution_xwindows "1920x1080"          # Run 'xrandr --display :0' when a X Windows session is running to the supported resolutions
+    set_resolution_grub "1920x1080x32"           # Run 'vbeinfo' (legacy, pre 18.04) or 'videoinfo' (UEFI) from the GRUB command line to see the supported modes
+    #-- Final cleanup
+    repair_permissions
+    remove_unneeded_packages
+    complete_install
+
+# If function names are provided as arguments, just run those functions
+# (then restore perms and clean up)
+else
+    enable_logging
+    for call_function in "$@"; do
+        $call_function
+    done
+    repair_permissions
+    complete_install
+fi
