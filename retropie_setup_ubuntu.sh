@@ -14,7 +14,7 @@ APT_RECOMMENDS=
 # Minimal depedencies to install RetroPie on Ubuntu
 RETROPIE_DEPENDS=(
     xorg openbox pulseaudio alsa-utils menu libglib2.0-bin python-xdg
-    at-spi2-core libglib2.0-bin dbus-x11 git dialog unzip xmlstarlet
+    at-spi2-core libglib2.0-bin dbus-x11 git dialog unzip xmlstarlet joystick
 )
 
 # Helpful packages to improve usability
@@ -57,15 +57,20 @@ function install_retropie() {
     echo "--------------------------------------------------------------------------------"
     echo "| Installing RetroPie"
     echo "--------------------------------------------------------------------------------"
-    # Get Retropie Setup script and perform an install of core packages only (no emulators)
+    # Get Retropie Setup script and perform an install of same packages 
+    # used in the RetroPie image (as applicable)
+    # See https://github.com/RetroPie/RetroPie-Setup/blob/master/scriptmodules/admin/image.sh
     cd $USER_HOME
     git clone --depth=1 https://github.com/RetroPie/RetroPie-Setup.git
-    $USER_HOME/RetroPie-Setup/retropie_packages.sh retroarch
-    $USER_HOME/RetroPie-Setup/retropie_packages.sh emulationstation
-    $USER_HOME/RetroPie-Setup/retropie_packages.sh retropiemenu
-    $USER_HOME/RetroPie-Setup/retropie_packages.sh runcommand
-    $USER_HOME/RetroPie-Setup/retropie_packages.sh samba
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh setup basic_install
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh bluetooth depends
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh usbromservice
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh samba depends
     $USER_HOME/RetroPie-Setup/retropie_packages.sh samba install_shares
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh splashscreen default
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh splashscreen enable
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh xpad
+    
     chown -R $USER:$USER $USER_HOME/RetroPie-Setup
     echo -e "Done\n\n"
     sleep 2

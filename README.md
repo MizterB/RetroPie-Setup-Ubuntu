@@ -55,6 +55,7 @@ If you are familiar with the use of Preseed files to automate Ubuntu installs (n
 - Validated against Ubuntu 20.04 LTS
 - Verbose logging to both console and file
 - Improved modularity, formatting, and commenting of functions
+- Installs the same base packages as the official RetroPie image
 - Installs latest Intel video driver
 - Option to reboot after install
 - Disabled screen blanking
