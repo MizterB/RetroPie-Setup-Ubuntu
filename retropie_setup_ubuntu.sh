@@ -6,6 +6,11 @@ USER_HOME="/home/$USER"
 SCRIPT_DIR="$(pwd)"
 LOG_FILE="$SCRIPT_DIR/$(basename $0 .sh).log"
 
+# Global setting for APT recommended packages - leave blank for now.
+# It's a little more bloated, but we can't get a clean boot without it.
+#APT_RECOMMENDS="$APT_RECOMMENDS"
+APT_RECOMMENDS=
+
 # Minimal depedencies to install RetroPie on Ubuntu
 RETROPIE_DEPENDS=(
     xorg openbox pulseaudio alsa-utils menu libglib2.0-bin python-xdg
@@ -41,7 +46,7 @@ function install_retropie_dependencies() {
     echo "| Updating OS packages and installing RetroPie dependencies"
     echo "--------------------------------------------------------------------------------"
     apt-get update && apt-get -y upgrade
-    apt-get -y install ${RETROPIE_DEPENDS[@]}
+    apt-get install -y $APT_RECOMMENDS ${RETROPIE_DEPENDS[@]}
     echo -e "Done\n\n"
     sleep 2
 }
@@ -108,6 +113,7 @@ function disable_sudo_password() {
 function install_latest_intel_drivers() {
     echo "--------------------------------------------------------------------------------"
     echo "| Installing the latest Intel video drivers from 'ppa:ubuntu-x-swat/updates'"
+    echo "| This may throw errors on a new release if this PPA does not supportit yet (OK)."
     echo "--------------------------------------------------------------------------------"
     add-apt-repository -y ppa:ubuntu-x-swat/updates
     apt-get update && apt-get -y upgrade
@@ -121,7 +127,7 @@ function install_latest_nvidia_drivers() {
     echo "--------------------------------------------------------------------------------"
     echo "- Installing the latest Nvidia video drivers"
     echo "--------------------------------------------------------------------------------"
-    apt-get -y install ubuntu-drivers-common
+    apt-get install -y $APT_RECOMMENDS ubuntu-drivers-common
     add-apt-repository -y ppa:graphics-drivers/ppa
     ubuntu-drivers autoinstall
     echo -e "Done\n\n"
@@ -134,7 +140,7 @@ function install_vulkan() {
     echo "--------------------------------------------------------------------------------"
     echo "| Installing Vulkan video drivers"
     echo "--------------------------------------------------------------------------------"
-    apt-get -y install mesa-vulkan-drivers
+    apt-get install -y $APT_RECOMMENDS mesa-vulkan-drivers
     echo -e "Done\n\n"
     sleep 2
 }
@@ -153,7 +159,7 @@ function enable_plymouth_theme() {
     echo "--------------------------------------------------------------------------------"
     echo "| Installing Plymouth boot splash and enabling theme '$PLYMOUTH_THEME'"
     echo "--------------------------------------------------------------------------------"
-    apt-get -y install plymouth plymouth-themes plymouth-x11
+    apt-get install -y $APT_RECOMMENDS plymouth plymouth-themes plymouth-x11
     rm -rf /tmp/plymouth-themes
     git clone --depth=1 https://github.com/HerbFargus/plymouth-themes.git /tmp/plymouth-themes
     mv /tmp/plymouth-themes/* /usr/share/plymouth/themes/
@@ -312,7 +318,7 @@ function install_extra_tools() {
     echo "| ${EXTRA_TOOLS[@]}"
     echo "--------------------------------------------------------------------------------"
     apt-get update
-    apt-get -y install ${EXTRA_TOOLS[@]}
+    apt-get install -y $APT_RECOMMENDS ${EXTRA_TOOLS[@]}
 
     # Configure 'inxi' if it was installed
     if [[ -x "$(command -v inxi)" ]]; then
@@ -492,6 +498,7 @@ if [[ -z "$1" ]]; then
     install_extra_tools
     fix_quirks
     #-- OPTIONAL STEPS (comment/change as needed)
+    #   These are helpful for improving 4k performance and user experience
     set_resolution_xwindows "1920x1080"          # Run 'xrandr --display :0' when a X Windows session is running to the supported resolutions
     set_resolution_grub "1920x1080x32"           # Run 'vbeinfo' (legacy, pre 18.04) or 'videoinfo' (UEFI) from the GRUB command line to see the supported modes
     #-- Final cleanup
