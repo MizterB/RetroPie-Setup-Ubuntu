@@ -4,17 +4,20 @@
 USER="$SUDO_USER"
 USER_HOME="/home/$USER"
 SCRIPT_DIR="$(pwd)"
-LOG_FILE="$SCRIPT_DIR/$(basename $0 .sh).log"
+SCRIPT_FILE="$(basename $0)"
+LOG_FILE="$SCRIPT_DIR/$(basename $0 .sh)-$(date +"%Y%m%d_%H%M%S").log"
+OPTIONAL_SCRIPT_DIR="$SCRIPT_DIR/optional_scripts"
 
 # Global setting for APT recommended packages - leave blank for now.
 # It's a little more bloated, but we can't get a clean boot without it.
-#APT_RECOMMENDS="$APT_RECOMMENDS"
+#APT_RECOMMENDS="–no-install-recommends"
 APT_RECOMMENDS=
 
 # Minimal depedencies to install RetroPie on Ubuntu
 RETROPIE_DEPENDS=(
     xorg openbox pulseaudio alsa-utils menu libglib2.0-bin python-xdg
     at-spi2-core libglib2.0-bin dbus-x11 git dialog unzip xmlstarlet joystick
+    triggerhappy
 )
 
 # Helpful packages to improve usability
@@ -47,7 +50,7 @@ function install_retropie_dependencies() {
     echo "--------------------------------------------------------------------------------"
     apt-get update && apt-get -y upgrade
     apt-get install -y $APT_RECOMMENDS ${RETROPIE_DEPENDS[@]}
-    echo -e "Done\n\n"
+    echo -e "FINISHED install_retropie_dependencies \n\n"
     sleep 2
 }
 
@@ -72,7 +75,7 @@ function install_retropie() {
     $USER_HOME/RetroPie-Setup/retropie_packages.sh xpad
     
     chown -R $USER:$USER $USER_HOME/RetroPie-Setup
-    echo -e "Done\n\n"
+    echo -e "FINISHED install_retropie \n\n"
     sleep 2
 }
 
@@ -97,7 +100,7 @@ function install_retroarch_shaders() {
     # Remove git repository from shader dir
     rm -rf /opt/retropie/configs/all/retroarch/shaders/.git
     chown -R $USER:$USER /opt/retropie/configs
-    echo -e "Done\n\n"
+    echo -e "FINISHED install_retroarch_shaders \n\n"
     sleep 2
 }
 
@@ -109,7 +112,7 @@ function disable_sudo_password() {
     echo "--------------------------------------------------------------------------------"
     echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/$USER-no-password-prompt
     chmod 0440 /etc/sudoers.d/$USER-no-password-prompt
-    echo -e "Done\n\n"
+    echo -e "FINISHED disable_sudo_password \n\n"
     sleep 2
 }
 
@@ -122,7 +125,7 @@ function install_latest_intel_drivers() {
     echo "--------------------------------------------------------------------------------"
     add-apt-repository -y ppa:ubuntu-x-swat/updates
     apt-get update && apt-get -y upgrade
-    echo -e "Done\n\n"
+    echo -e "FINISHED install_latest_intel_drivers \n\n"
     sleep 2
 }
 
@@ -135,7 +138,7 @@ function install_latest_nvidia_drivers() {
     apt-get install -y $APT_RECOMMENDS ubuntu-drivers-common
     add-apt-repository -y ppa:graphics-drivers/ppa
     ubuntu-drivers autoinstall
-    echo -e "Done\n\n"
+    echo -e "FINISHED install_latest_nvidia_drivers \n\n"
     sleep 2
 }
 
@@ -146,7 +149,7 @@ function install_vulkan() {
     echo "| Installing Vulkan video drivers"
     echo "--------------------------------------------------------------------------------"
     apt-get install -y $APT_RECOMMENDS mesa-vulkan-drivers
-    echo -e "Done\n\n"
+    echo -e "FINISHED install_vulkan \n\n"
     sleep 2
 }
 
@@ -171,7 +174,7 @@ function enable_plymouth_theme() {
     update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth /usr/share/plymouth/themes/$PLYMOUTH_THEME/$PLYMOUTH_THEME.plymouth 10
     update-alternatives --set default.plymouth /usr/share/plymouth/themes/$PLYMOUTH_THEME/$PLYMOUTH_THEME.plymouth
     update-initramfs -u
-    echo -e "Done\n\n"
+    echo -e "FINISHED enable_plymouth_theme \n\n"
     sleep 2
 }
 
@@ -196,7 +199,7 @@ function hide_boot_messages() {
     # Disable motd
     touch $USER_HOME/.hushlogin
     chown $USER:$USER $USER_HOME/.hushlogin
-    echo -e "Done\n\n"
+    echo -e "FINISHED hide_boot_messages \n\n"
     sleep 2
 }
 
@@ -208,7 +211,7 @@ function enable_runlevel_multiuser () {
     echo "| Enabling the 'multi-user' runlevel"
     echo "--------------------------------------------------------------------------------"
     systemctl set-default multi-user
-    echo -e "Done\n\n"
+    echo -e "FINISHED enable_runlevel_multiuser \n\n"
     sleep 2
 }
 
@@ -225,7 +228,7 @@ ExecStart=
 ExecStart=-/sbin/agetty --skip-login --noissue --autologin $USER %I \$TERM
 Type=idle
 EOF
-    echo -e "Done\n\n"
+    echo -e "FINISHED enable_autologin_tty \n\n"
     sleep 2
 }
 
@@ -246,7 +249,7 @@ if [[ -z \$DISPLAY ]] && [[ \$(tty) = /dev/tty1 ]]; then
 fi
 EOF
     chown $USER:$USER $USER_HOME/.bash_profile
-    echo -e "Done\n\n"
+    echo -e "FINISHED enable_autostart_xwindows \n\n"
     sleep 2
 }
 
@@ -261,12 +264,12 @@ function hide_openbox_windows() {
     cat << EOF >> $USER_HOME/.bash_profile
 $GNOME_TERMINAL_SETTINGS use-theme-colors false
 $GNOME_TERMINAL_SETTINGS use-theme-transparency false
-$GNOME_TERMINAL_SETTINGS default-show-menubar false
 $GNOME_TERMINAL_SETTINGS foreground-color '#FFFFFF'
 $GNOME_TERMINAL_SETTINGS background-color '#000000'
 $GNOME_TERMINAL_SETTINGS cursor-blink-mode 'off'
 $GNOME_TERMINAL_SETTINGS scrollbar-policy 'never'
 $GNOME_TERMINAL_SETTINGS audible-bell 'false'
+gsettings set org.gnome.Terminal.Legacy.Settings default-show-menubar false
 EOF
     chown $USER:$USER $USER_HOME/.bash_profile
 
@@ -286,7 +289,7 @@ EOF
     rm /tmp/rc.xml.applications
     sed -e 's/<keepBorder>yes<\/keepBorder>/<keepBorder>no<\/keepBorder>/g' -i $USER_HOME/.config/openbox/rc.xml
     chown -R $USER:$USER $USER_HOME/.config
-    echo -e "Done\n\n"
+    echo -e "FINISHED hide_openbox_xwindows \n\n"
     sleep 2
 }
 
@@ -311,7 +314,7 @@ function autostart_openbox_apps() {
 
 gnome-terminal --full-screen --hide-menubar -- emulationstation --no-splash         # RPSU_End autostart_openbox_apps
 EOF
-    echo -e "Done\n\n"
+    echo -e "FINISHED autostart_openbox_apps \n\n"
     sleep 2
 }
 
@@ -336,7 +339,7 @@ function install_extra_tools() {
         inxi -U
     fi
     
-    echo -e "Done\n\n"
+    echo -e "FINISHED install_extra_tools \n\n"
     sleep 2
 }
 
@@ -365,7 +368,7 @@ function fix_quirks() {
     sed -i '1 i\xset s off && xset -dpms' $USER_HOME/.xsession
     echo -e "\n"
 
-    echo -e "Done\n\n"
+    echo -e "FINISHED fix_quirks \n\n"
     sleep 2    
 }
 
@@ -400,7 +403,7 @@ EOF
     # Insert into autostart.sh after the 1st line (after shebang)
     sed -i '1r /tmp/set_resolution_xwindows' "/opt/retropie/configs/all/autostart.sh"
     rm /tmp/set_resolution_xwindows
-    echo -e "Done\n\n"
+    echo -e "FINISHED set_resolution_xwindows \n\n"
     sleep 2
 }
 
@@ -425,6 +428,39 @@ function set_resolution_grub() {
     update-grub
     echo -e "Done\n\n"
     sleep 2
+    echo -e "FINISHED set_resolution_grub \n\n"
+}
+
+
+# Run any optional scripts that the user has proveded
+function run_optional_scripts() {
+    OPTIONAL_SCRIPT_PATH=$1
+    
+    # If a specific file is provided, just run that
+    if [[ -f OPTIONAL_SCRIPT_PATH ]]; then
+        echo "--------------------------------------------------------------------------------"
+        echo "| Running optional script at $OPTIONAL_SCRIPT_PATH"
+        echo "--------------------------------------------------------------------------------"
+        echo -e "\n"
+        source "$OPTIONAL_SCRIPT_PATH"
+        sleep 2
+
+    # Otherwise, run all scripts in the provided directory
+    else
+        echo "--------------------------------------------------------------------------------"
+        echo "| Running any optional scripts found in $OPTIONAL_SCRIPT_PATH"
+        echo "--------------------------------------------------------------------------------"
+        ls "$OPTIONAL_SCRIPT_PATH" | sort -n | while read OPTIONAL_SCRIPT_FILE; do
+            OPTIONAL_SCRIPT="$OPTIONAL_SCRIPT_DIR/$OPTIONAL_SCRIPT_SUBDIR/$OPTIONAL_SCRIPT_FILE"
+            if [[ -f $OPTIONAL_SCRIPT ]] && [[ $OPTIONAL_SCRIPT_FILE != *README* ]]; then
+                echo -e "\n"
+                source "$OPTIONAL_SCRIPT"
+                sleep 2
+            fi
+        done
+
+    echo -e "\n\n"
+    echo -e "FINISHED run_optional_scripts \n\n"
 }
 
 
@@ -435,7 +471,7 @@ function repair_permissions() {
     echo "| by changing owner to $USER on all files and directories under $USER_HOME"
     echo "--------------------------------------------------------------------------------"
     chown -R $USER:$USER $USER_HOME/
-    echo -e "Done\n\n"
+    echo -e "FINISHED repair_permissions \n\n"
     sleep 2
 }
 
@@ -447,7 +483,7 @@ function remove_unneeded_packages() {
     echo "--------------------------------------------------------------------------------"
     apt-get update && apt-get -y upgrade
     apt-get -y autoremove
-    echo -e "Done\n\n"
+    echo -e "FINISHED remove_unneeded_packages \n\n"
     sleep 2
 }
 
@@ -463,16 +499,25 @@ function prompt_for_reboot() {
 
 # Final message to user
 function complete_install() {
+    RUNTIME=$SECONDS
     echo "--------------------------------------------------------------------------------"
-    echo "| Installation has completed"
+    echo "| Installation complete"
+    echo "| Runtime: $(($RUNTIME / 60)) minutes and $(($RUNTIME % 60)) seconds"
     echo "| Output has been logged to '$LOG_FILE'"
     echo "--------------------------------------------------------------------------------"
     prompt_for_reboot
 }
 
-
-# Force this script to run as root
-[ `whoami` = root ] || { sudo "$0" "$@"; exit $?; }
+# Make sure the user is running the script via sudo
+if [ -z "$USER" ]; then
+    echo "This script requires sudo privileges. Please run with: sudo $0"
+    exit 1
+fi
+# Don't allow the user to run this script from the root account. RetroPie doesn't like this.
+if [[ "$USER" == root ]]; then
+    echo "This script cannot be run by the root user.  Please run as normal user using sudo."
+    exit 1
+fi
 
 #--------------------------------------------------------------------------------
 #| INSTALLATION SCRIPT 
@@ -482,6 +527,7 @@ if [[ -z "$1" ]]; then
 
     #-- Log this script's output
     enable_logging
+    run_optional_scripts "$OPTIONAL_SCRIPT_DIR/pre_install"
     #-- Basic RetroPie install 
     install_retropie_dependencies
     install_retropie
@@ -506,6 +552,7 @@ if [[ -z "$1" ]]; then
     #   These are helpful for improving 4k performance and user experience
     set_resolution_xwindows "1920x1080"          # Run 'xrandr --display :0' when a X Windows session is running to the supported resolutions
     set_resolution_grub "1920x1080x32"           # Run 'vbeinfo' (legacy, pre 18.04) or 'videoinfo' (UEFI) from the GRUB command line to see the supported modes
+    run_optional_scripts "$OPTIONAL_SCRIPT_DIR/post_install"
     #-- Final cleanup
     repair_permissions
     remove_unneeded_packages
