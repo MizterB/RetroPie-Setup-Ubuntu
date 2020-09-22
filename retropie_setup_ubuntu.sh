@@ -432,33 +432,32 @@ function set_resolution_grub() {
 }
 
 
-# Run any optional scripts that the user has proveded
+# Run any optional scripts that the user has provided
 function run_optional_scripts() {
-    OPTIONAL_SCRIPT_PATH=$1
-    
+    SCRIPT_PATH=$OPTIONAL_SCRIPT_DIR/$1
     # If a specific file is provided, just run that
-    if [[ -f OPTIONAL_SCRIPT_PATH ]]; then
+    if [[ -f $SCRIPT_PATH ]]; then
+        SCRIPT_FILE_PATH=$SCRIPT_PATH
         echo "--------------------------------------------------------------------------------"
-        echo "| Running optional script at $OPTIONAL_SCRIPT_PATH"
+        echo "| Running optional script at $SCRIPT_FILE_PATH"
         echo "--------------------------------------------------------------------------------"
         echo -e "\n"
-        source "$OPTIONAL_SCRIPT_PATH"
+        source "$SCRIPT_FILE_PATH"
         sleep 2
-
     # Otherwise, run all scripts in the provided directory
     else
         echo "--------------------------------------------------------------------------------"
-        echo "| Running any optional scripts found in $OPTIONAL_SCRIPT_PATH"
+        echo "| Running any optional scripts found in $SCRIPT_PATH"
         echo "--------------------------------------------------------------------------------"
-        ls "$OPTIONAL_SCRIPT_PATH" | sort -n | while read OPTIONAL_SCRIPT_FILE; do
-            OPTIONAL_SCRIPT="$OPTIONAL_SCRIPT_DIR/$OPTIONAL_SCRIPT_SUBDIR/$OPTIONAL_SCRIPT_FILE"
-            if [[ -f $OPTIONAL_SCRIPT ]] && [[ $OPTIONAL_SCRIPT_FILE != *README* ]]; then
+        ls "$SCRIPT_PATH" | sort -n | while read SCRIPT_FILE; do
+            SCRIPT_FILE_PATH="$SCRIPT_PATH/$SCRIPT_FILE"
+            if [[ -f $SCRIPT_FILE_PATH ]] && [[ $SCRIPT_FILE_PATH != *README* ]]; then
                 echo -e "\n"
-                source "$OPTIONAL_SCRIPT"
+                source "$SCRIPT_FILE_PATH"
                 sleep 2
             fi
         done
-
+    fi
     echo -e "\n\n"
     echo -e "FINISHED run_optional_scripts \n\n"
 }
@@ -509,12 +508,12 @@ function complete_install() {
 }
 
 # Make sure the user is running the script via sudo
-if [ -z "$USER" ]; then
+if [ -z "$SUDO_USER" ]; then
     echo "This script requires sudo privileges. Please run with: sudo $0"
     exit 1
 fi
 # Don't allow the user to run this script from the root account. RetroPie doesn't like this.
-if [[ "$USER" == root ]]; then
+if [[ "$SUDO_USER" == root ]]; then
     echo "This script cannot be run by the root user.  Please run as normal user using sudo."
     exit 1
 fi
