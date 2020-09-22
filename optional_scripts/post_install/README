@@ -1,0 +1,5 @@
+This directory contains optional shell scripts that will be executed at the end of the RetroPie install process, just before to the final cleanup steps.
+
+Scripts can be copied, moved. or linked into here from the `library` directory, or you can create your own.
+
+Scripts will be executed in alphabetical oder, so you can prepend numbers to the script names if you want to manage the execution order.
