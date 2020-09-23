@@ -35,6 +35,7 @@ Perform a basic install of Ubuntu with these basic options
 
 - Language: `english`
 - Keyboard: `english`
+- Hostname: `retropie`
 - Username: `pi`
 - Password: `raspberry`
 - Partition Scheme: `entire disk` (preferred, not required)
@@ -76,21 +77,58 @@ If you want to include a Library script in your pre or post-install proceess, th
 
 You can also write your own custom scripts and place them in these directories. Use the scripts in the Library as an example. Note that variables defined in the master script (`USER_HOME`, `SCRIPT_DIR`, etc.) are also available to the custom scripts, and that all output will be automatically written to both the console output and log file.
 
+Additionally, you can create a single pre/post-install script that calls multiple Library scripts by using the `source` command. Note that paths should be relative to the `retropie_setup_ubuntu.sh` script. For example:
+
+```
+#!/bin/bash
+###############################################################################
+# This is an example script that wraps multiple Library scripts
+# that disable system services
+###############################################################################
+echo "--------------------------------------------------------------------------------"
+echo "| Disabling multiple services via Library scripts"
+echo "--------------------------------------------------------------------------------"
+echo -e "\n\n"
+source ./optional_scripts/library/disable_apparmor.sh
+source ./optional_scripts/library/disable_avahi_daemon.sh
+source ./optional_scripts/library/disable_bluetooth.sh
+source ./optional_scripts/library/disable_modemmanager.sh
+source ./optional_scripts/library/disable_samba.sh
+echo -e "FINISHED $BASH_SOURCE \n\n"
+```
+
 ### Submissions Welcome!
 
 If you have master script changes or additional fetaures that you would like to include in the Library, please share! Pull Requests are preferred.
 
+## Calling Single Functions or Optional Scripts
+
+Running the installer script `retropie_setup_ubuntu.sh` without any arguments results in the full installer logic being executed. However, you can also pass individual function names as arguments, and the script will just execute those functions. For example:
+
+`sudo ~/RetroPie-Setup-Ubuntu/retropie_setup_ubuntu.sh "set_resolution_xwindows 720x640"`
+
+or
+
+`sudo ~/RetroPie-Setup-Ubuntu/retropie_setup_ubuntu.sh "run_optional_scripts pre_install/pre_install.sh"`
+
+or
+
+`sudo ~/RetroPie-Setup-Ubuntu/retropie_setup_ubuntu.sh "run_optional_scripts library/enable_wifi.sh"`
+
+However, take care when running a function or script more than once - depending on the steps it takes, it could create duplicate configuration entries and break your system!
+
 ## CHANGELOG
 
-### 202009xx
+### 20200923
 
 - Instructions for multiple 20.04 install methods, including autoinstall example
 - New bootstrap installation process
 - Customizations possible through pre_install and post_install script directories
 - Library of optional scripts
-- Logfile is timestamped
+- Log file is timestamped
 - Script runtime is now calculated
 - Prevent running as root user, only allow sudo as normal user
+- _MANY THANKS TO [@etheling](https://github.com/etheling) FOR [MULTIPLE RECOMMENDATIONS](https://retropie.org.uk/forum/post/234008) FOR THIS RELEASE!_
 
 ### 20200521
 
@@ -103,8 +141,7 @@ If you have master script changes or additional fetaures that you would like to 
 - Disabled screen blanking
 - Safely enable 1080p resolution in GRUB, if available _- user can override resolution in script_
 - Safely enable 1080p resolution in X Windows, if available _- user can override resolution in script_
-
-#### MANY THANKS TO [@movisman](https://github.com/movisman) FOR HIS [CODE OPTIMIZATION AND NEW FUNCTIONS](https://github.com/MizterB/RetroPie-Setup-Ubuntu/pull/4)!
+- _MANY THANKS TO [@movisman](https://github.com/movisman) FOR HIS [CODE OPTIMIZATION AND NEW FUNCTIONS](https://github.com/MizterB/RetroPie-Setup-Ubuntu/pull/4)!_
 
 ### 20190728
 
