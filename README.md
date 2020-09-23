@@ -55,7 +55,7 @@ If you are familiar with the use of [preseed](https://help.ubuntu.com/lts/instal
 
   `wget -O - https://raw.githubusercontent.com/MizterB/RetroPie-Setup-Ubuntu/LTS-20.04/bootstrap.sh | sudo bash`
 
-- Configure optional packages, if desired
+- Configure [Optional Scripts](#optional-scripts), if desired
 
 - Run the installer script as sudo
 
@@ -75,7 +75,7 @@ The `optional_scripts/pre_install` and `optional_scripts/post_install` directori
 
 If you want to include a Library script in your pre or post-install proceess, the easiest way to do this is to simply copy it into the appropriate folder. Alternatively, you can also move the Library scripts or create symbolic links to them.
 
-You can also write your own custom scripts and place them in these directories. Use the scripts in the Library as an example. Note that variables defined in the master script (`USER_HOME`, `SCRIPT_DIR`, etc.) are also available to the custom scripts, and that all output will be automatically written to both the console output and log file.
+You can also write your own custom scripts and place them in these directories. Use the scripts in the Library as an example. Note that variables defined in the master script (`USER_HOME`, `SCRIPT_DIR`, etc.) are also available to the custom scripts, and that all output will be automatically written to both the console and log file.
 
 Additionally, you can create a single pre/post-install script that calls multiple Library scripts by using the `source` command. Note that paths should be relative to the `retropie_setup_ubuntu.sh` script. For example:
 
@@ -103,7 +103,7 @@ If you have master script changes or additional fetaures that you would like to 
 
 ## Calling Single Functions or Optional Scripts
 
-Running the installer script `retropie_setup_ubuntu.sh` without any arguments results in the full installer logic being executed. However, you can also pass individual function names as arguments, and the script will just execute those functions. For example:
+Running the installer script `retropie_setup_ubuntu.sh` without any arguments results in the full installer logic being executed. But you can also pass individual function names as arguments, and the script will just execute those functions. For example:
 
 `sudo ~/RetroPie-Setup-Ubuntu/retropie_setup_ubuntu.sh "set_resolution_xwindows 720x640"`
 
