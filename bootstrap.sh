@@ -3,10 +3,28 @@
 # This script provides a simple, one-step approach for installing the 
 # RetroPie-Setup-Ubuntu package and its requrired dependencies.
 #--------------------------------------------------------------------------------
-SCRIPT_DIR="$(pwd)"
+SCRIPT_PATH="$(realpath $0)"
+SCRIPT_DIR="$(dirname $SCRIPT_PATH)"
+SCRIPT_FILE="$(basename $SCRIPT_PATH)"
 REPO_NAME="RetroPie-Setup-Ubuntu"
-REPO_URL="https://github.com/MizterB/$REPO_NAME"
+
+# Default repository and branch
+REPO_URL="https://github.com/MizterB/RetroPie-Setup-Ubuntu"
 REPO_BRANCH="LTS-20.04"
+# Overide Reo URL and/or branch via "-r [repository url]" and "-b [branch]" command-line options 
+while getopts "r:b:" OPTIONS; do
+    case "${OPTIONS}" in
+        r)
+            REPO_URL=${OPTARG}
+            ;;
+        b)
+            REPO_BRANCH=${OPTARG}
+            ;;
+        *)
+            echo "WARNING: Ignoring unknown option -${OPTARG}"
+            ;;
+    esac
+done
 
 # Make sure the user is running the script via sudo
 if [ -z "$SUDO_USER" ]; then
