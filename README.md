@@ -51,15 +51,24 @@ If you are familiar with the use of [preseed](https://help.ubuntu.com/lts/instal
 
 ## RetroPie-Setup-Ubuntu
 
-- Log in as the `pi` user and run the bootstrap script
+- Log in as the `pi` user
+- Download the bootstrap script
 
-  `wget -qO - https://raw.githubusercontent.com/MizterB/RetroPie-Setup-Ubuntu/LTS-20.04/bootstrap.sh | sudo bash`
+  `wget -q https://raw.githubusercontent.com/MizterB/RetroPie-Setup-Ubuntu/LTS-20.04/bootstrap.sh`
+
+- Run the bootstrap script
+
+  `sudo bash ./bootstrap.sh`
+
+  Optionally, you can override the Git repository (-r) and branch (-b) used by the bootstrap script. This is helpful if you want to bootstrap from your own fork or a different branch. The available options can be passed as follows:
+
+  `sudo bash ./bootstrap.sh -r https://github.com/<USERNAME>/RetroPie-Setup-Ubuntu -b <BRANCHNAME>`
 
 - Configure [Optional Scripts](#optional-scripts), if desired
 
 - Run the installer script as sudo
 
-  `sudo ~/RetroPie-Setup-Ubuntu/retropie_setup_ubuntu.sh`
+  `sudo ./RetroPie-Setup-Ubuntu/retropie_setup_ubuntu.sh`
 
 ## Optional Scripts
 
