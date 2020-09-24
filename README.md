@@ -53,7 +53,7 @@ If you are familiar with the use of [preseed](https://help.ubuntu.com/lts/instal
 
 - Log in as the `pi` user and run the bootstrap script
 
-  `wget -O - https://raw.githubusercontent.com/MizterB/RetroPie-Setup-Ubuntu/LTS-20.04/bootstrap.sh | sudo bash`
+  `wget -qO - https://raw.githubusercontent.com/MizterB/RetroPie-Setup-Ubuntu/LTS-20.04/bootstrap.sh | sudo bash`
 
 - Configure [Optional Scripts](#optional-scripts), if desired
 
