@@ -3,8 +3,9 @@
 # Computed variables
 USER="$SUDO_USER"
 USER_HOME="/home/$USER"
-SCRIPT_DIR="$(pwd)"
-SCRIPT_FILE="$(basename $0)"
+SCRIPT_PATH="$(realpath $0)"
+SCRIPT_DIR="$(dirname $SCRIPT_PATH)"
+SCRIPT_FILE="$(basename $SCRIPT_PATH)"
 LOG_FILE="$SCRIPT_DIR/$(basename $0 .sh)-$(date +"%Y%m%d_%H%M%S").log"
 OPTIONAL_SCRIPT_DIR="$SCRIPT_DIR/optional_scripts"
 
@@ -434,7 +435,7 @@ function set_resolution_grub() {
 
 # Run any optional scripts that the user has provided
 function run_optional_scripts() {
-    SCRIPT_PATH=$OPTIONAL_SCRIPT_DIR/$1
+    SCRIPT_PATH=$1
     # If a specific file is provided, just run that
     if [[ -f $SCRIPT_PATH ]]; then
         SCRIPT_FILE_PATH=$SCRIPT_PATH
