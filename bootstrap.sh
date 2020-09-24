@@ -10,7 +10,7 @@ REPO_NAME="RetroPie-Setup-Ubuntu"
 
 # Default repository and branch
 REPO_URL="https://github.com/MizterB/RetroPie-Setup-Ubuntu"
-REPO_BRANCH="LTS-20.04"
+REPO_BRANCH="master"
 # Overide Reo URL and/or branch via "-r [repository url]" and "-b [branch]" command-line options 
 while getopts "r:b:" OPTIONS; do
     case "${OPTIONS}" in
@@ -41,8 +41,9 @@ fi
 apt-get update && apt-get install -y git
 
 # Clone the repository
-git clone --depth 1 --branch $REPO_BRANCH $REPO_URL.git
+git clone $REPO_URL.git
 chown -R $SUDO_USER:$SUDO_USER $REPO_NAME
+git --git-dir="$SCRIPT_DIR/$REPO_NAME/.git" switch $REPO_BRANCH
 
 # Mark the setup script as executable
 chmod +x $SCRIPT_DIR/$REPO_NAME/retropie_setup_ubuntu.sh

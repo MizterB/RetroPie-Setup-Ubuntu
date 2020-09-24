@@ -1,6 +1,6 @@
 # RetroPie-Setup-Ubuntu
 
-Script to automate the installation on RetroPie on Ubuntu, with the end-state user experience nearly identical to a Raspberry Pi installation, but with the power and flexibility of x86.
+Script to automate the installation on RetroPie on Ubuntu 20.04, with the end-state user experience nearly identical to a Raspberry Pi installation, but with the power and flexibility of x86.
 
 This script was inspired by feedback provided on the [RetroPie forums](https://retropie.org.uk/forum/topic/18810/retropie-installation-on-ubuntu-server-x64-18-04-1), and does the following:
 
@@ -54,7 +54,7 @@ If you are familiar with the use of [preseed](https://help.ubuntu.com/lts/instal
 - Log in as the `pi` user
 - Download the bootstrap script
 
-  `wget -q https://raw.githubusercontent.com/MizterB/RetroPie-Setup-Ubuntu/LTS-20.04/bootstrap.sh`
+  `wget -q https://raw.githubusercontent.com/MizterB/RetroPie-Setup-Ubuntu/master/bootstrap.sh`
 
 - Run the bootstrap script
 
@@ -114,7 +114,7 @@ If you have master script changes or additional fetaures that you would like to 
 
 Running the installer script `retropie_setup_ubuntu.sh` without any arguments results in the full installer logic being executed. But you can also pass individual function names as arguments, and the script will just execute those functions. For example:
 
-`sudo ~/RetroPie-Setup-Ubuntu/retropie_setup_ubuntu.sh "set_resolution_xwindows 720x640"`
+`sudo ~/RetroPie-Setup-Ubuntu/retropie_setup_ubuntu.sh "set_resolution_xwindows 720x480"`
 
 or
 
@@ -130,6 +130,7 @@ However, take care when running a function or script more than once - depending 
 
 ### 20200923
 
+- 20.04 promoted to master branch
 - Instructions for multiple 20.04 install methods, including autoinstall example
 - New bootstrap installation process
 - Customizations possible through pre_install and post_install script directories
