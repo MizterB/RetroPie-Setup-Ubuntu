@@ -425,7 +425,7 @@ function set_resolution_grub() {
     echo "| to see the supported modes"
     echo "| This value, 'GRUB_GFXMODE', can be edited in /etc/default/grub"
     echo "--------------------------------------------------------------------------------"
-    sed -i 's/#GRUB_GFXMODE=.*/GRUB_GFXMODE=$MODES/g' /etc/default/grub
+    sed -i "s/#GRUB_GFXMODE=.*/GRUB_GFXMODE=$MODES/g" "/etc/default/grub"
     update-grub
     echo -e "Done\n\n"
     sleep 2
