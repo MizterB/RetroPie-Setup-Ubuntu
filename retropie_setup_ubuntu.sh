@@ -476,6 +476,34 @@ function repair_permissions() {
 }
 
 
+# xsession errors cleanup
+function xsession-errors-cleanup() {
+    echo "--------------------------------------------------------------------------------"
+    echo "| Cleaning up items that generate xsessions errors (~/.xsession-errors)"
+    echo "| Also creating an init job that deletes the /home/pi/.xsession-errors file"
+    echo "| at each reboot so we are starting with a clean file"
+    echo "--------------------------------------------------------------------------------"
+    
+    # Remove all files from /etc/xdg/autostart
+    rm /etc/xdg/autostart/*
+    mkdir -p $USER_HOME/.config/autostart
+    chown -R $USER:$USER $USER_HOME/.config/autostart
+    
+    # Create init job to delete /home/pi/.xsession-errors at each login
+    cat << EOF >> /etc/init.d/xsession-errors
+    
+#!/bin/sh
+rm $USER_HOME/.xsession-errors
+
+EOF
+    chmod +x /etc/init.d/xsession-errors
+    ln -s /etc/init.d/xsession-errors /etc/rc2.d/S15xsession-errors
+    
+    echo -e "FINISHED xsession-errors-cleanup \n\n"
+    sleep 2
+}
+
+
 # Remove unneeded packages
 function remove_unneeded_packages() {
     echo "--------------------------------------------------------------------------------"
@@ -555,6 +583,7 @@ if [[ -z "$1" ]]; then
     run_optional_scripts "$OPTIONAL_SCRIPT_DIR/post_install"
     #-- Final cleanup
     repair_permissions
+    xsession-errors-cleanup
     remove_unneeded_packages
     complete_install
 
