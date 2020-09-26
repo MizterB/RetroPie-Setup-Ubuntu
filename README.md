@@ -114,17 +114,20 @@ If you have master script changes or additional fetaures that you would like to 
 
 Running the installer script `retropie_setup_ubuntu.sh` without any arguments results in the full installer logic being executed. But you can also pass individual function names as arguments, and the script will just execute those functions. For example:
 
-`sudo ~/RetroPie-Setup-Ubuntu/retropie_setup_ubuntu.sh "set_resolution_xwindows 720x480"`
+`sudo retropie_setup_ubuntu.sh "set_resolution_xwindows 720x480"`
 
 or
 
-`sudo ~/RetroPie-Setup-Ubuntu/retropie_setup_ubuntu.sh "run_optional_scripts pre_install/pre_install.sh"`
+`sudo retropie_setup_ubuntu.sh "run_optional_scripts optional_scripts/pre_install/pre_install.sh"`
 
 or
 
-`sudo ~/RetroPie-Setup-Ubuntu/retropie_setup_ubuntu.sh "run_optional_scripts library/enable_wifi.sh"`
+`sudo retropie_setup_ubuntu.sh "run_optional_scripts optional_scripts/library/enable_wifi.sh"`
 
-However, take care when running a function or script more than once - depending on the steps it takes, it could create duplicate configuration entries and break your system!
+A couple of things to note...
+
+- Take care when running a function or script more than once - depending on the steps it takes, it could create duplicate configuration entries and break your system!
+- When calling an optional script, the script path should be absolute, or _relative to the current directory_. This means that you can also run arbitrary scripts from outside the Retropie-Setup-Ubuntu directory structure if desired.
 
 ## CHANGELOG
 
