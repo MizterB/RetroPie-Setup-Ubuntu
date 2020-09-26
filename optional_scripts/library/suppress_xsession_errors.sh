@@ -18,7 +18,7 @@ mkdir -p $USER_HOME/.config/autostart
 chown -R $USER:$USER $USER_HOME/.config/autostart
 
 # Rename .desktop files to .desktop.skip
-mv -v /etc/xdg/autostart/*.desktop /etc/xdg/autostart/*.desktop.skip
+find /etc/xdg/autostart/ -depth -name "*.desktop" -exec sh -c 'mv "$1" "${1%.abc}.skip"' _ {} \;
 
 # Create init job to delete ~/.xsession-errors at each login
 cat << EOF >> /etc/init.d/xsession-errors
