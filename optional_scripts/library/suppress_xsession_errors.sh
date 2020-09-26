@@ -13,12 +13,12 @@
 echo "--------------------------------------------------------------------------------"
 echo "| Suppressing errors in $HOME/.xsession-errors"
 echo "--------------------------------------------------------------------------------"
+# Create ~/.config/autostart folder and fix perms
 mkdir -p $USER_HOME/.config/autostart
 chown -R $USER:$USER $USER_HOME/.config/autostart
 
+# Rename .desktop files to .desktop.skip
 mv -v /etc/xdg/autostart/*.desktop /etc/xdg/autostart/*.desktop.skip
-## /etc/xdg/autostart/org.gnome.SettingsDaemon.XSettings.desktop must stay or gsettings won't work
-mv -v /etc/xdg/autostart/org.gnome.SettingsDaemon.XSettings.desktop.skip /etc/xdg/autostart/org.gnome.SettingsDaemon.XSettings.desktop
 
 # Create init job to delete ~/.xsession-errors at each login
 cat << EOF >> /etc/init.d/xsession-errors
