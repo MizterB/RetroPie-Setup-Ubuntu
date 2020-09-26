@@ -42,8 +42,10 @@ apt-get update && apt-get install -y git
 
 # Clone the repository
 git clone $REPO_URL.git
+cd $REPO_NAME
+git switch $REPO_BRANCH
+cd $SCRIPT_DIR
 chown -R $SUDO_USER:$SUDO_USER $REPO_NAME
-git --git-dir="$SCRIPT_DIR/$REPO_NAME/.git" switch $REPO_BRANCH
 
 # Mark the setup script as executable
 chmod +x $SCRIPT_DIR/$REPO_NAME/retropie_setup_ubuntu.sh
