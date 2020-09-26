@@ -246,7 +246,7 @@ function enable_autostart_xwindows() {
     # Add startx to .bash_profile
     cat << EOF >> $USER_HOME/.bash_profile
 if [[ -z \$DISPLAY ]] && [[ \$(tty) = /dev/tty1 ]]; then
-    startx -- >/dev/null 2>&1
+    exec startx -- >/dev/null 2>&1
 fi
 EOF
     chown $USER:$USER $USER_HOME/.bash_profile
