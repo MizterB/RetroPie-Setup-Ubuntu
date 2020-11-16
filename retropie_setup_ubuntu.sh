@@ -81,25 +81,33 @@ function install_retropie() {
 }
 
 
-# Install RetroArch shaders from official repository
+# Install RetroArch shaders from official repository                                                                
 function install_retroarch_shaders() {
     echo "--------------------------------------------------------------------------------"
-    echo "| Removing the RPi shaders installed by RetroPie-Setup"
-    echo "| and replacing with RetroArch shaders (merge of common & GLSL) from Libretro"
+    echo "| Remove the RPi shaders installed by RetroPie-Setup and replace with"
+    echo "| RetroArch (merge of common & GLSL, and new Slang) shaders from Libretro"
     echo "--------------------------------------------------------------------------------"
-    # Cleanup pi shaders installed by RetroPie-Setup
+    # Cleanup pi shaders installed by RetroPie-Setup                                                                
     rm -rf /opt/retropie/configs/all/retroarch/shaders
     mkdir -p /opt/retropie/configs/all/retroarch/shaders
-    # Install common shaders from Libretro repository
+    mkdir -p /opt/retropie/configs/all/retroarch/shaders-slang
+    # Install common shaders from Libretro repository                                                               
     git clone --depth=1 https://github.com/libretro/common-shaders.git /tmp/common-shaders
     cp -r /tmp/common-shaders/* /opt/retropie/configs/all/retroarch/shaders/
     rm -rf /tmp/common-shaders
-    # Install GLSL shaders from Libretro repository
+    # Install GLSL shaders from Libretro repository                                                                 
     git clone --depth=1 https://github.com/libretro/glsl-shaders.git /tmp/glsl-shaders
     cp -r /tmp/glsl-shaders/* /opt/retropie/configs/all/retroarch/shaders/
     rm -rf /tmp/glsl-shaders
-    # Remove git repository from shader dir
+    # Install Slang shaders from Libretro repository (for use with Vulkan, glcore, ..)                              
+    # https://www.libretro.com/index.php/category/slang/                                                            
+    git clone --depth=1 https://github.com/libretro/slang-shaders.git /tmp/slang-shaders
+    cp -r /tmp/slang-shaders/* /opt/retropie/configs/all/retroarch/shaders-slang
+    rm -rf /tmp/slang-shaders
+
+    # Remove git repository from shader dir                                                                         
     rm -rf /opt/retropie/configs/all/retroarch/shaders/.git
+    rm -rf /opt/retropie/configs/all/retroarch/slang-shaders/.git
     chown -R $USER:$USER /opt/retropie/configs
     echo -e "FINISHED install_retroarch_shaders \n\n"
     sleep 2
