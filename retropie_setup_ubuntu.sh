@@ -16,7 +16,7 @@ APT_RECOMMENDS=
 
 # Minimal depedencies to install RetroPie on Ubuntu
 RETROPIE_DEPENDS=(
-    xorg openbox pulseaudio alsa-utils menu libglib2.0-bin python-xdg
+    xorg openbox pulseaudio alsa-utils menu libglib2.0-bin python3-xdg
     at-spi2-core libglib2.0-bin dbus-x11 git dialog unzip xmlstarlet joystick
     triggerhappy
 )
@@ -84,8 +84,8 @@ function install_retropie() {
 # Install RetroArch shaders from official repository
 function install_retroarch_shaders() {
     echo "--------------------------------------------------------------------------------"
-    echo "| Removing the RPi shaders installed by RetroPie-Setup"
-    echo "| and replacing with RetroArch shaders (merge of common & GLSL) from Libretro"
+    echo "| Remove the RPi shaders installed by RetroPie-Setup and replace with"
+    echo "| RetroArch (merge of common & GLSL, and new Slang) shaders from Libretro"
     echo "--------------------------------------------------------------------------------"
     # Cleanup pi shaders installed by RetroPie-Setup
     rm -rf /opt/retropie/configs/all/retroarch/shaders
@@ -98,6 +98,12 @@ function install_retroarch_shaders() {
     git clone --depth=1 https://github.com/libretro/glsl-shaders.git /tmp/glsl-shaders
     cp -r /tmp/glsl-shaders/* /opt/retropie/configs/all/retroarch/shaders/
     rm -rf /tmp/glsl-shaders
+    # Install Slang shaders from Libretro repository (for use with Vulkan, glcore, ..)                              
+    # https://www.libretro.com/index.php/category/slang/                                                            
+    git clone --depth=1 https://github.com/libretro/slang-shaders.git /tmp/slang-shaders
+    cp -r /tmp/slang-shaders/* /opt/retropie/configs/all/retroarch/shaders/
+    rm -rf /tmp/slang-shaders
+
     # Remove git repository from shader dir
     rm -rf /opt/retropie/configs/all/retroarch/shaders/.git
     chown -R $USER:$USER /opt/retropie/configs
