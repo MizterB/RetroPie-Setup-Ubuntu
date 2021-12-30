@@ -69,22 +69,20 @@ function install_retropie() {
 
     UNKNOWN_PLATFORM=$($USER_HOME/RetroPie-Setup/retropie_packages.sh setup | grep "Unknown platform" | wc -l)
 	if [[ $UNKNOWN_PLATFORM ]]; then
-        PLATFORM_OVERRIDE="__platform=generic-x11"
         echo "WARNING: This platform is NOT SUPPORTED by RetroPie.  Is this a Ubuntu ARM installation?"
         echo -e "To allow RetroPie to run, the __platform variable is being manually overwritten as 'generic-x11' in /etc/environment.\n\n"
-        echo "$PLATFORM_OVERRIDE" | sudo tee -a /etc/environment > /dev/null
-    else
-        PLATFORM_OVERRIDE=
+        export __platform=generic-x11
+        echo "__platform=$__platform" | sudo tee -a /etc/environment > /dev/null
     fi
-    
-    $PLATFORM_OVERRIDE $USER_HOME/RetroPie-Setup/retropie_packages.sh setup basic_install
-    $PLATFORM_OVERRIDE $USER_HOME/RetroPie-Setup/retropie_packages.sh bluetooth depends
-    $PLATFORM_OVERRIDE $USER_HOME/RetroPie-Setup/retropie_packages.sh usbromservice
-    $PLATFORM_OVERRIDE $USER_HOME/RetroPie-Setup/retropie_packages.sh samba depends
-    $PLATFORM_OVERRIDE $USER_HOME/RetroPie-Setup/retropie_packages.sh samba install_shares
-    $PLATFORM_OVERRIDE $USER_HOME/RetroPie-Setup/retropie_packages.sh splashscreen default
-    $PLATFORM_OVERRIDE $USER_HOME/RetroPie-Setup/retropie_packages.sh splashscreen enable
-    $PLATFORM_OVERRIDE $USER_HOME/RetroPie-Setup/retropie_packages.sh xpad
+
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh setup basic_install
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh bluetooth depends
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh usbromservice
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh samba depends
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh samba install_shares
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh splashscreen default
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh splashscreen enable
+    $USER_HOME/RetroPie-Setup/retropie_packages.sh xpad
     chown -R $USER:$USER $USER_HOME/RetroPie-Setup
     echo -e "FINISHED install_retropie \n\n"
     sleep 2
