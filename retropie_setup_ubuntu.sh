@@ -66,6 +66,12 @@ function install_retropie() {
     # See https://github.com/RetroPie/RetroPie-Setup/blob/master/scriptmodules/admin/image.sh
     cd $USER_HOME
     git clone --depth=1 https://github.com/RetroPie/RetroPie-Setup.git
+    SUPPORTED_PLATFORM=$($USER_HOME/RetroPie-Setup/retropie_packages.sh setup | grep "Unknown platform" | wc -l)
+	if [[ $SUPPORTED_PLATFORM > 0 ]]; then
+        echo "WARNING: This platform is NOT SUPPORTED by RetroPie.  Is this a Ubuntu ARM installation?"
+        echo -e "To allow installtion to to continue, the __platform variable is being manually overwritten as 'generic-x11' in /etc/environment.\n\n"
+        echo "__platform=\"generic-x11\"" | sudo tee -a /etc/environment > /dev/null
+    fi
     $USER_HOME/RetroPie-Setup/retropie_packages.sh setup basic_install
     $USER_HOME/RetroPie-Setup/retropie_packages.sh bluetooth depends
     $USER_HOME/RetroPie-Setup/retropie_packages.sh usbromservice
