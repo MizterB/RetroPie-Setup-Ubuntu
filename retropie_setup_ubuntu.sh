@@ -69,8 +69,8 @@ function install_retropie() {
 
     UNKNOWN_PLATFORM=$($USER_HOME/RetroPie-Setup/retropie_packages.sh setup | grep "Unknown platform" | wc -l)
 	if [[ $UNKNOWN_PLATFORM ]]; then
-        echo "WARNING: This platform is NOT SUPPORTED by RetroPie.  Is this a Ubuntu ARM installation?"
-        echo -e "To allow RetroPie to run, the __platform variable is being manually overwritten as 'generic-x11' in /etc/environment.\n\n"
+        echo "\nWARNING: This platform is NOT SUPPORTED by RetroPie.  Is this a Ubuntu ARM installation?"
+        echo -e "To allow RetroPie to run, the __platform variable is being manually overwritten as 'generic-x11' in /etc/environment.\n"
         export __platform=generic-x11
         echo "__platform=$__platform" | sudo tee -a /etc/environment > /dev/null
     fi
