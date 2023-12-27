@@ -21,25 +21,48 @@ Of course, your mileage may vary when using the master `retropie_setup_ubuntu.sh
 
 ## Installing the Base OS
 
-### Download a copy of Ubuntu 20.04
+### Download a copy of Ubuntu 22.04 or 20.04
 
-These scripts are intended for one of the following Ubuntu 20.04 installations:
+These scripts are intended for one of the following Ubuntu 22.04 or 20.04 installations:
 
-- [Live Server](http://releases.ubuntu.com/focal/ubuntu-20.04.1-live-server-amd64.iso)
-- [Legacy Server](http://cdimage.ubuntu.com/ubuntu-legacy-server/releases/20.04/release/ubuntu-20.04.1-legacy-server-amd64.iso)
-- [Legacy Minimal Install (mini.iso)](http://archive.ubuntu.com/ubuntu/dists/focal/main/installer-amd64/current/legacy-images/netboot/mini.iso)
+- [22.0.4 Live Server (**Recommended**)](http://releases.ubuntu.com/jammy/ubuntu-22.04.3-live-server-amd64.iso)
+- [20.0.4 Live Server](http://releases.ubuntu.com/focal/ubuntu-20.04.1-live-server-amd64.iso)
+- [20.0.4 Legacy Server](http://cdimage.ubuntu.com/ubuntu-legacy-server/releases/20.04/release/ubuntu-20.04.1-legacy-server-amd64.iso)
+- [20.0.4 Legacy Minimal Install (mini.iso)](http://archive.ubuntu.com/ubuntu/dists/focal/main/installer-amd64/current/legacy-images/netboot/mini.iso)
 
 ### Manual Ubuntu Install
 
 Perform a basic install of Ubuntu with these basic options
 
 - Language: `English`
-- Keyboard: `English`
-- Hostname: `retropie`
-- Username: `pi`
-- Password: `raspberry`
-- Partition Scheme: `entire disk` (preferred, not required)
-- Optional Install: `openssh-server` (recommended for remote access, copy/paste)
+- If prompted to do so, choose to `Update to the new installer`
+- Keyboard configuration:
+  - Keyboard: `English (US)`
+  - Keyboard variant: `English (US)`
+- Type of install:
+  - The base for the installation: `Ubuntu Server`sudo 
+  - Additional options: `Search for third-party drivers` checked/selected
+- Network connections: configure as needed to obtain a valid IP address
+- Configure proxy: leave blank unless your network uses a web proxy (which would not be typical)
+- Configure the Ubuntu archive mirror
+  - The default mirror should be OK
+  - Wait for the test to complete (`This mirror location passed tests.`), then press `Enter/Return`.
+- Guided storage configuration: use defaults (preferred, not required), i.e.:
+  - Leave selected: `Use an entire disk`
+  - Leave selected: `Set up this disk as an LVM group`
+  - Leave **unselected**: `Encrypt the LVM group with LUKS`
+- Profile setup:
+  - Your name: `pi`
+  - Your server's name: `retropie`
+  - Pick a username: `pi`
+  - Password: `raspberry`
+- Upgrade to Ubuntu Pro
+  - Leave `Skip for now` selected
+- SSH Setup
+  - Optional: Choose to `Install OpenSSH server` (which allows for remote access, copy/paste)
+  - Import SSH identity: leave `no` selected
+- Complete/acknowledge the `Third-party drivers` screen
+- Do not select any `Featured Server Snaps`
 
 ### Automated Ubuntu Install - Live Server
 
@@ -49,9 +72,12 @@ If you are familiar with the use of [autoinstall](https://ubuntu.com/server/docs
 
 If you are familiar with the use of [preseed](https://help.ubuntu.com/lts/installation-guide/s390x/apbs02.html) files to automate Ubuntu installs (no support here), you can use the example [retropie.preseed](autoinstall/retropie.preseed) file to perform a basic install against the Legacy Server or Mini installer. _Use at your own risk!!!_
 
-## RetroPie-Setup-Ubuntu
+## Start the RetroPie Setup Script
 
-- Log in as the `pi` user
+Note: Do not log in via SSH yet.
+If you do, the RetroPie setup process will disconnect your SSH session and make the setup process appear hung.
+
+- If you have not already done so, reboot the Ubuntu Server following the operating system installation, then log in as the `pi` user.
 - Download the `bootstrap.sh` script
 
   `wget -q https://raw.githubusercontent.com/MizterB/RetroPie-Setup-Ubuntu/master/bootstrap.sh`
@@ -69,6 +95,29 @@ If you are familiar with the use of [preseed](https://help.ubuntu.com/lts/instal
 - Run the installer script as sudo
 
   `sudo ./RetroPie-Setup-Ubuntu/retropie_setup_ubuntu.sh`
+
+- The script will run for some time.
+Depending on your system's architecture, you may see RetroPie Setup start, resulting in the process pausing at a disclaimer screen.
+  - If this happens, press `Enter` to accept the disclaimer.
+  - Then, use the arrow keys to select `Exit`, then press `Enter`.
+  - The installation of RetroPie continues.
+
+- When prompted, reboot the system
+
+## A Note on Exiting and Restarting EmulationStation
+
+This setup uses a desktop environment called `Openbox` to bootstrap the start of `EmulationStation`.
+This is done to ensure that EmulationStation is consistently launched in full screen and the foreground.
+
+As a consequence of this setup, when you exit EmulationStation, you will be faced with a black screen instead of a terminal prompt.
+To return to a terminal prompt, right-click the mouse and a pop-up menu will appear.
+Click `Exit`, then click `Exit` again to confirm.
+You are now in a terminal.
+
+Because EmulationStation requires a desktop environment, to restart it, we'll need to first start Openbox.
+Therefore, the easiest way to restart EmulationStation is to type:
+
+`startx`
 
 ## Optional Scripts
 
@@ -108,7 +157,8 @@ echo -e "FINISHED $BASH_SOURCE \n\n"
 
 ### Submissions Welcome
 
-If you have master script changes or additional features that you would like to include in the Library, please share! Pull Requests are preferred.
+If you have master script changes or additional features that you would like to include in the Library, please share!
+Pull Requests are preferred.
 
 ## Calling Single Functions or Optional Scripts
 
@@ -130,6 +180,12 @@ A couple of things to note...
 - When calling an optional script, the script path should be absolute, or _relative to the current directory_. This means that you can also run arbitrary scripts from outside the Retropie-Setup-Ubuntu directory structure if desired.
 
 ## CHANGELOG
+
+### 20221226
+
+- Explicitly support Ubuntu 22.04
+- Clarifications to make the setup process more user-friendly
+- Markdown cleanup
 
 ### 20200923
 
