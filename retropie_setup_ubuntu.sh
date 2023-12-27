@@ -553,8 +553,8 @@ if [[ -z "$1" ]]; then
     install_latest_nvidia_drivers
     install_vulkan
     #-- Hide text and boot directly into EmulationStation
-    # enable_plymouth_theme "retropie-pacman"       # See https://github.com/HerbFargus/plymouth-themes.git for other theme names
-    hide_boot_messages
+    enable_plymouth_theme "retropie-pacman"       # See https://github.com/HerbFargus/plymouth-themes.git for other theme names
+    # hide_boot_messages
     enable_runlevel_multiuser
     enable_autologin_tty
     enable_autostart_xwindows
