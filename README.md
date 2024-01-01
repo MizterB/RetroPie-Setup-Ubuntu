@@ -51,6 +51,7 @@ Perform a basic install of Ubuntu with these basic options
   - Leave selected: `Use an entire disk`
   - Leave selected: `Set up this disk as an LVM group`
   - Leave **unselected**: `Encrypt the LVM group with LUKS`
+  - **Note:** after installing Ubuntu, we recommend reviewing the logical volume configuration because it seems the installer does not configure the logical volume to use the full disk space amount (as you would expect from a RetroPie system).
 - Profile setup:
   - Your name: `pi`
   - Your server's name: `retropie`
@@ -71,6 +72,35 @@ If you are familiar with the use of [autoinstall](https://ubuntu.com/server/docs
 ### Automated Ubuntu Install - Legacy Mini & Legacy Server
 
 If you are familiar with the use of [preseed](https://help.ubuntu.com/lts/installation-guide/s390x/apbs02.html) files to automate Ubuntu installs (no support here), you can use the example [retropie.preseed](autoinstall/retropie.preseed) file to perform a basic install against the Legacy Server or Mini installer. _Use at your own risk!!!_
+
+## Verify the Disk Configuration
+
+As noted, Ubuntu setup does not configure the logical volume to use the full size of the disk.
+To confirm the current configuration, perform the following steps:
+
+- Run the following command:
+
+  `df -h`
+
+- Look for the largest filesystem on the list (in terms of what is listed in the `size` column).
+In testing, the size was only set to 100G (100 GB) on a 2 TB SSD.
+
+To correct this, you must extend the logical volume and file system by running the following commands:
+
+- Determine the logical volume path by running the following command:
+
+  `sudo lvscan`
+
+  In the results, take note of the logical volume path.
+  In testing, it was `/dev/ubuntu-vg/ubuntu-lv`.
+- Extend the logical volume:
+
+  `sudo lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv`
+
+  (if necessary, replace the logical volume path with that which you observed in the `lvscan` command)
+- Resize the file system:
+
+  `sudo resize2fs /dev/ubuntu-vg/ubuntu-lv`
 
 ## Start the RetroPie Setup Script
 
