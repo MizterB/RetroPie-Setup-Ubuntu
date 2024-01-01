@@ -1,6 +1,6 @@
 # RetroPie-Setup-Ubuntu
 
-Script to automate the installation on RetroPie on Ubuntu 20.04, with the end-state user experience nearly identical to a Raspberry Pi installation, but with the power and flexibility of x86.
+Script to automate the installation on RetroPie on Ubuntu 22.04 or 20.04, with the end-state user experience nearly identical to a Raspberry Pi installation, but with the power and flexibility of x86.
 
 This script was inspired by feedback provided on the [RetroPie forums](https://retropie.org.uk/forum/topic/18810/retropie-installation-on-ubuntu-server-x64-18-04-1), and does the following:
 
@@ -40,7 +40,7 @@ Perform a basic install of Ubuntu with these basic options
   - Keyboard: `English (US)`
   - Keyboard variant: `English (US)`
 - Type of install:
-  - The base for the installation: `Ubuntu Server`sudo 
+  - The base for the installation: `Ubuntu Server`
   - Additional options: `Search for third-party drivers` checked/selected
 - Network connections: configure as needed to obtain a valid IP address
 - Configure proxy: leave blank unless your network uses a web proxy (which would not be typical)
@@ -181,7 +181,7 @@ A couple of things to note...
 
 ## CHANGELOG
 
-### 20221226
+### 20230101
 
 - Explicitly support Ubuntu 22.04
 - Clarifications to make the setup process more user-friendly
