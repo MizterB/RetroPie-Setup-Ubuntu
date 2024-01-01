@@ -220,7 +220,7 @@ A couple of things to note...
 
 ## CHANGELOG
 
-### 20230101
+### 20240101
 
 - Explicitly support Ubuntu 22.04
 - Clarifications to make the setup process more user-friendly
