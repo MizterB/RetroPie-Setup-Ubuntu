@@ -224,6 +224,7 @@ A couple of things to note...
 
 - Explicitly support Ubuntu 22.04
 - Clarifications to make the setup process more user-friendly
+- Add instructions to extend the logical volume (and use up the full disk)
 - Markdown cleanup
 
 ### 20200923
