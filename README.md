@@ -136,18 +136,27 @@ Depending on your system's architecture, you may see RetroPie Setup start, resul
 
 ## A Note on Exiting and Restarting EmulationStation
 
-This setup uses a desktop environment called `Openbox` to bootstrap the start of `EmulationStation`.
+This setup uses a desktop environment called Openbox to bootstrap the start of EmulationStation.
 This is done to ensure that EmulationStation is consistently launched in full screen and the foreground.
 
 As a consequence of this setup, when you exit EmulationStation, you will be faced with a black screen instead of a terminal prompt.
 To return to a terminal prompt, right-click the mouse and a pop-up menu will appear.
-Click `Exit`, then click `Exit` again to confirm.
-You are now in a terminal.
+Click `Terminal emulator` to open a terminal.
+When you are done working in the terminal, type `exit` and you will return to the black screen `Openbox` environment.
 
-Because EmulationStation requires a desktop environment, to restart it, we'll need to first start Openbox.
-Therefore, the easiest way to restart EmulationStation is to type:
+The easiest way to restart EmulationStation is to restart Openbox.
+To do so, right-click the mouse and a pop-up menu will appear.
+Click `Exit`.
 
-`startx`
+Depending on the environment configuration, one of two things will happen:
+
+- Openbox will exit and then restart, thereby restarting EmulationStation;
+
+  **or**,
+- Openbox will exit and return to a terminal prompt.
+In this case, to restart Openbox, type:
+
+  `startx`
 
 ## Optional Scripts
 
