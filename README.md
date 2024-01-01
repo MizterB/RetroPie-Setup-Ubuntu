@@ -25,7 +25,7 @@ Of course, your mileage may vary when using the master `retropie_setup_ubuntu.sh
 
 These scripts are intended for one of the following Ubuntu 22.04 or 20.04 installations:
 
-- [22.0.4 Live Server (**Recommended**)](http://releases.ubuntu.com/jammy/ubuntu-22.04.3-live-server-amd64.iso)
+- [22.0.4 Live Server](http://releases.ubuntu.com/jammy/ubuntu-22.04.3-live-server-amd64.iso) (**Recommended**)
 - [20.0.4 Live Server](http://releases.ubuntu.com/focal/ubuntu-20.04.1-live-server-amd64.iso)
 - [20.0.4 Legacy Server](http://cdimage.ubuntu.com/ubuntu-legacy-server/releases/20.04/release/ubuntu-20.04.1-legacy-server-amd64.iso)
 - [20.0.4 Legacy Minimal Install (mini.iso)](http://archive.ubuntu.com/ubuntu/dists/focal/main/installer-amd64/current/legacy-images/netboot/mini.iso)
@@ -78,6 +78,7 @@ If you are familiar with the use of [preseed](https://help.ubuntu.com/lts/instal
 As noted, Ubuntu setup does not configure the logical volume to use the full size of the disk.
 To confirm the current configuration, perform the following steps:
 
+- If you have not already done so, reboot the Ubuntu Server following the operating system installation, then log in as the `pi` user.
 - Run the following command:
 
   `df -h`
@@ -104,7 +105,7 @@ To correct this, you must extend the logical volume and file system by running t
 
 ## Start the RetroPie Setup Script
 
-Note: Do not log in via SSH yet.
+**Note:** Do not log in via SSH at this point.
 If you do, the RetroPie setup process will disconnect your SSH session and make the setup process appear hung.
 
 - If you have not already done so, reboot the Ubuntu Server following the operating system installation, then log in as the `pi` user.
